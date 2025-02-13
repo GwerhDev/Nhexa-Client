@@ -1,6 +1,15 @@
 .container-menu-desk {
-  padding: 1rem;
-  padding-inline: 2rem;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+
+  .inner-container {
+    padding: 1rem;
+    padding-inline: 2rem;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
 }
 
 .ul-menu-desktop {
@@ -8,6 +17,7 @@
   padding: 0;
   display: flex;
   width: 100%;
+  max-width: 2000px;
   background: var(--secondary-semitransparent-background-color);
   backdrop-filter: blur(10px);
   border-radius: 1rem;

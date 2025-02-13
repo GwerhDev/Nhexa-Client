@@ -5,29 +5,30 @@ import { closeMenu } from '../../../helpers/menu';
 
 <template>
   <div class="d-flex container-menu-desk">
-    <ul class="ul-menu-desktop">
-      <li>
-        <router-link class="lateral-menu-link" to="/" @click="closeMenu()">
-          La Ruina Records
-        </router-link>
-      </li>
-      <li>
-        <router-link class="lateral-menu-link" to="/" @click="closeMenu()">
-          El Umbral Studios
-        </router-link>
-      </li>
-      <li>
-        <router-link class="lateral-menu-link" to="/" @click="closeMenu()">
-          Terminal Core
-        </router-link>
-      </li>
-      <li>
-        <router-link class="lateral-menu-link" to="/" @click="closeMenu()">
-          Fulgor Systems
-        </router-link>
-      </li>
-    </ul>
-<!--     <ul class="ul-menu-desktop d-none">
+    <div class="inner-container">
+      <ul class="ul-menu-desktop">
+        <li>
+          <router-link class="lateral-menu-link" to="/" @click="closeMenu()">
+            La Ruina Records
+          </router-link>
+        </li>
+        <li>
+          <router-link class="lateral-menu-link" to="/" @click="closeMenu()">
+            El Umbral Studios
+          </router-link>
+        </li>
+        <li>
+          <router-link class="lateral-menu-link" to="/" @click="closeMenu()">
+            Terminal Core
+          </router-link>
+        </li>
+        <li>
+          <router-link class="lateral-menu-link" to="/" @click="closeMenu()">
+            Fulgor Systems
+          </router-link>
+        </li>
+      </ul>
+      <!--     <ul class="ul-menu-desktop d-none">
       <li>
         <router-link class="lateral-menu-link" to="/environment/apps" @click="closeMenu()">
           Aplicaciones
@@ -39,5 +40,6 @@ import { closeMenu } from '../../../helpers/menu';
         </router-link>
       </li>
     </ul> -->
+    </div>
   </div>
 </template>

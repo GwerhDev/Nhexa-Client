@@ -14,7 +14,9 @@ token && store.handleUserData(token);
 
 <template>
   <div class="viewport-container">
-    <nav-bar />
+    <header>
+      <nav-bar />
+    </header>
     <div class="app-container">
       <div class="router-view">
         <router-view />
