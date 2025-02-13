@@ -2,14 +2,14 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useStore } from '../../../middlewares/store';
+import { ACCOUNTS_URL, CLIENT_URL } from '../../../middlewares/misc/const';
 import { CanvasMenuFunction, closeAccountMenu, closeMenu } from '../../../helpers/menu';
-import userIcon from '../../../assets/svg/user-icon.svg'
+import userIcon from '../../../assets/svg/user-icon.svg';
 
 const store = useStore();
-const currentUser: any = computed(() => store.currentUser);
 const userToken: any = computed(() => store.userToken);
+const currentUser: any = computed(() => store.currentUser);
 const logged: any = computed(() => currentUser.value.logged);
-const pathAccount: string = '/account/settings/';
 
 CanvasMenuFunction("#account-menu-container");
 
@@ -24,19 +24,23 @@ function select() {
   closeMenu();
 };
 
+const pathAccount: string = `${ACCOUNTS_URL}/auth?token=${userToken.value}`;
+const loginRoute: string = `${ACCOUNTS_URL}/login?callback=${encodeURIComponent(CLIENT_URL)}`;
+const signupRoute: string = `${ACCOUNTS_URL}/register?callback=${encodeURIComponent(CLIENT_URL)}`;
+
 </script>
 
 <template>
   <ul class="account-menu-container" id="account-menu-container">
     <li v-if="!logged">
-      <router-link class="menu-text principal-button" to='/login' @click="select()">
+      <a class="menu-text principal-button" :href="loginRoute" @click="select()">
         Iniciar sesión
-      </router-link>
+      </a>
     </li>
     <li v-if="!logged">
-      <router-link class="menu-text secondary-button" to='/register' @click="select()">
+      <a class="menu-text secondary-button" :href="signupRoute" @click="select()">
         Registrarse
-      </router-link>
+      </a>
     </li>
     <li class="current-user-data" v-if="logged">
       <h2>{{ currentUser?.userData?.username }}</h2>
@@ -45,9 +49,9 @@ function select() {
     </li>
     <div class="separator"></div>
     <li v-if="logged">
-      <router-link class="menu-text principal-button" :to="pathAccount + userToken" @click="select()">
+      <a class="menu-text principal-button" :href="pathAccount" @click="select()">
         Administrar cuenta
-      </router-link>
+      </a>
     </li>
     <li v-if="logged">
       <router-link class="menu-text secondary-button" to='/' @click="logout()">
