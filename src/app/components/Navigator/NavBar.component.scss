@@ -1,0 +1,21 @@
+.nav-container {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  display: flex;
+}
+
+@media (max-width: 1080px) {
+  .menu-nav-desktop {
+    display: none;
+  }
+
+  .nav-container {
+    position: fixed;
+    z-index: 9;
+    height: auto;
+    top: 0;
+    left: 0;
+    background-color: var(--components-background);
+  }
+}

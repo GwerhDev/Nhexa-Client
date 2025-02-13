@@ -1,0 +1,30 @@
+.container-menu-desk {
+  padding: 1rem;
+  padding-inline: 2rem;
+}
+
+.ul-menu-desktop {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  width: 100%;
+  background: var(--secondary-semitransparent-background-color);
+  backdrop-filter: blur(10px);
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+.lateral-menu-link {
+  padding: 1rem;
+  padding-inline: 2rem;
+  transition-duration: .4s;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-wrap: nowrap;
+
+  &:hover {
+    background-color: var(--primary-hover-color);
+  }
+}
