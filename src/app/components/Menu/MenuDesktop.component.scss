@@ -9,6 +9,8 @@
     width: 100%;
     display: flex;
     justify-content: center;
+    gap: 1rem;
+    max-width: 2000px;
   }
 }
 
@@ -17,11 +19,45 @@
   padding: 0;
   display: flex;
   width: 100%;
-  max-width: 2000px;
   background: var(--secondary-semitransparent-background-color);
   backdrop-filter: blur(10px);
   border-radius: 1rem;
   overflow: hidden;
+}
+
+.ul-search {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  background: var(--secondary-semitransparent-background-color);
+  backdrop-filter: blur(10px);
+  border-radius: 1rem;
+  overflow: hidden;
+
+  li {
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: flex-end;
+
+    input {
+      width: 100%;
+      border: none;
+      padding-inline: 1rem;
+      background: transparent;
+
+      &:focus, &:focus-visible {
+        border: none;
+        outline: none;
+      }
+    }
+
+    button {
+      border: none;
+      background-color: transparent;
+    }
+  }
+
 }
 
 .lateral-menu-link {

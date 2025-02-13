@@ -40,6 +40,15 @@ import { closeMenu } from '../../../helpers/menu';
         </router-link>
       </li>
     </ul> -->
+
+      <ul class="ul-search">
+        <li>
+          <input type="text" placeholder="Buscar...">
+          <button>
+            <img src="" alt="">
+          </button>
+        </li>
+      </ul>
     </div>
   </div>
 </template>
