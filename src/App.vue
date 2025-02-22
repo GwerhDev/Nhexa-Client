@@ -2,7 +2,6 @@
 import { computed } from 'vue';
 import { useStore } from './middlewares/store/index';
 import NavBar from './app/components/Navigator/NavBar.component.vue';
-import LateralBar from './app/components/Navigator/LateralBar.component.vue';
 
 const store: any = useStore();
 const token: any = localStorage.getItem('userToken');
