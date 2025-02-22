@@ -12,7 +12,7 @@ export const menuList: Array<any> = [
         label: "La Ruina Records",
         description: "Estudio de Sonido",
         icon: laruinarecordsIcon,
-        url: "#"
+        url: "https://laruina.cl"
       }, {
         label: "El Umbral Studios",
         description: "Estudio de diseño y animación 3D",
@@ -22,7 +22,7 @@ export const menuList: Array<any> = [
         label: "Terminal Core",
         description: "Desarrollo de Software",
         icon: terminalcoreIcon,
-        url: "#"
+        url: "https://terminalcore.cl"
       }, {
         label: "Fulgor Systems",
         description: "Ciberseguridad",
