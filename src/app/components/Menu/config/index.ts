@@ -33,11 +33,11 @@ export const menuList: Array<any> = [
     label: "Aplicaciones",
     submenu: [
       {
-        label: "Nhexa TV",
+        label: "Nhexa Vision",
         description: "Streaming",
         route: "#"
       }, {
-        label: "Nhexa Play",
+        label: "Nhexa Pod",
         description: "Audio y música",
         route: "#"
       }, {
