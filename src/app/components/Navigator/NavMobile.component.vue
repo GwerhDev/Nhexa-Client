@@ -1,8 +1,13 @@
 <style scoped lang="scss" src="./NavMobile.component.scss" />
 <script setup lang="ts">
+import { computed } from 'vue';
+import { useStore } from '../../../middlewares/store';
 import { openMenu, closeMenu, openAccountMenu, openAppMenu } from '../../../helpers/menu';
 import Logo from '../Logo/Logo.component.vue';
 import MenuMobile from '../Menu/MenuMobile.component.vue';
+
+const store: any = useStore();
+const currentUser: any = computed(() => store.currentUser);
 
 </script>
 
