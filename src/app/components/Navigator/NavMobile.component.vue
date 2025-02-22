@@ -16,10 +16,10 @@ const currentUser: any = computed(() => store.currentUser);
     <div class="d-flex align-cent logo-container">
       <div class="d-flex align-cent logo-cont">
         <div class="burger-menu-container">
-          <img src="../../../assets/svg/icon-burger-menu.svg" @click="openMenu()" alt="">
+          <font-awesome-icon class="icon" :icon="['fas', 'bars']" @click="openMenu()" alt="" />
         </div>
         <div class="close-menu-container" alt="">
-          <img src="../../../assets/svg/close-icon.svg" @click="closeMenu()" alt="">
+          <font-awesome-icon class="icon" :icon="['fas', 'xmark']" @click="closeMenu()" alt="" />
         </div>
         <Logo :width="'40'"  @click="closeMenu()" />
       </div>

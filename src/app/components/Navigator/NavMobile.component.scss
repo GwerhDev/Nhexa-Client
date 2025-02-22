@@ -38,15 +38,12 @@ input {
 }
 
 .burger-menu-container {
-  display: none;
+  margin: 0;
   padding: 0;
+  display: none;
   justify-content: flex-start;
   align-items: center;
-
-  img {
-    cursor: pointer;
-    display: none;
-  }
+  width: 15px;
 }
 
 .close-menu-container {
@@ -55,11 +52,7 @@ input {
   display: none;
   justify-content: flex-start;
   align-items: flex-start;
-  width: 23.5px;
-
-  img:hover {
-    cursor: pointer;
-  }
+  width: 15px;
 }
 
 .logo-cont {
