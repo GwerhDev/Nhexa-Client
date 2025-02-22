@@ -4,7 +4,6 @@ import { computed } from 'vue';
 import { useStore } from '../../../middlewares/store';
 import { ACCOUNTS_URL, CLIENT_URL } from '../../../middlewares/misc/const';
 import { CanvasMenuFunction, closeAccountMenu, closeMenu } from '../../../helpers/menu';
-import userIcon from '../../../assets/svg/user-icon.svg';
 
 const store = useStore();
 const userToken: any = computed(() => store.userToken);
@@ -44,7 +43,8 @@ const signupRoute: string = `${ACCOUNTS_URL}/register?callback=${encodeURICompon
     </li>
     <li class="current-user-data" v-if="logged">
       <h2>{{ currentUser?.userData?.username }}</h2>
-      <img :src="currentUser?.userData?.profilePic ?? userIcon" alt="">
+      <img v-if="currentUser?.userData?.profilePic" :src="currentUser?.userData?.profilePic" alt="">
+      <font-awesome-icon v-else icon="fa-solid fa-user" />
       <p>{{ currentUser?.userData?.role }}</p>
     </li>
     <div class="separator"></div>

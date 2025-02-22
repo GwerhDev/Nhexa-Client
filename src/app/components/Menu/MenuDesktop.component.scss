@@ -1,11 +1,11 @@
 .container-menu-desk {
+  width: 100%;
   display: flex;
   justify-content: center;
-  width: 100%;
 
   .inner-container {
     padding: .5rem;
-    padding-inline: 2rem;
+    padding-inline: 0;
     width: 100%;
     display: flex;
     justify-content: center;
@@ -21,24 +21,25 @@
   width: 100%;
   background: var(--secondary-semitransparent-background-color);
   backdrop-filter: blur(10px);
-  border-radius: 1rem;
-  overflow: hidden;
+  border-radius: .5rem;
 }
 
 .ul-search {
   margin: 0;
   padding: 0;
+  height: 56px;
   display: flex;
-  background: var(--secondary-semitransparent-background-color);
   backdrop-filter: blur(10px);
-  border-radius: 1rem;
-  overflow: hidden;
+  border-radius: .5rem;
 
   li {
     padding: 0;
     margin: 0;
     display: flex;
     justify-content: flex-end;
+    align-items: center;
+    border-radius: .5rem;
+    background: var(--secondary-semitransparent-background-color);
 
     input {
       width: 100%;
@@ -46,7 +47,8 @@
       padding-inline: 1rem;
       background: transparent;
 
-      &:focus, &:focus-visible {
+      &:focus,
+      &:focus-visible {
         border: none;
         outline: none;
       }
@@ -55,22 +57,74 @@
     button {
       border: none;
       background-color: transparent;
+
+      &:focus,
+      &:focus-visible {
+        border: none;
+        outline: none;
+      }
     }
   }
-
 }
 
-.lateral-menu-link {
-  padding: 1rem;
-  padding-inline: 2rem;
+.label-menu-link {
   transition-duration: .4s;
-  color: white;
+  color: var(--nhexa-white);
   display: flex;
   align-items: center;
   justify-content: center;
   text-wrap: nowrap;
+  position: relative;
+  cursor: pointer;
 
   &:hover {
-    background-color: var(--primary-hover-color);
+    background-color: var(--menu-hover-color);
+
+    .submenu {
+      border-radius: .5rem;
+      display: flex;
+    }
   }
+}
+
+.label-submenu-link {
+  gap: 1rem;
+  padding: 1rem;
+  padding-right: 2rem;
+  transition-duration: .4s;
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  color: var(--nhexa-white);
+
+  &:hover {
+    background-color: var(--menu-hover-color);
+  }
+}
+
+.submenu-container {
+  left: 0;
+  top: 56px;
+  padding-top: .5rem;
+  position: absolute;
+
+  .submenu {
+    margin: 0;
+    padding: 0;
+    display: none;
+    flex-direction: column;
+    backdrop-filter: blur(10px);
+    background: var(--secondary-background-color);
+    border: solid 1px rgba(105, 105, 105, 0.705);
+    overflow: hidden;
+  }
+}
+
+.description {
+  color: rgb(168, 168, 168);;
+}
+
+#first {
+  border-top-left-radius: .5rem;
+  border-bottom-left-radius: .5rem;
 }
