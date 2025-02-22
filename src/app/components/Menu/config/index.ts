@@ -6,53 +6,51 @@ import fulgorsystemsIcon from "../../../../assets/svg/fulgorsystems-logo.svg";
 export const menuList: Array<any> = [
   {
     label: "Departamentos",
-    url: null,
     submenu: [
       {
         label: "La Ruina Records",
         description: "Estudio de Sonido",
         icon: laruinarecordsIcon,
-        url: "https://laruina.cl"
+        href: "https://laruina.cl"
       }, {
         label: "El Umbral Studios",
         description: "Estudio de diseño y animación 3D",
         icon: elumbralstudiosIcon,
-        url: "#"
+        href: "#"
       }, {
         label: "Terminal Core",
         description: "Desarrollo de Software",
         icon: terminalcoreIcon,
-        url: "https://terminalcore.cl"
+        href: "https://terminalcore.cl"
       }, {
         label: "Fulgor Systems",
         description: "Ciberseguridad",
         icon: fulgorsystemsIcon,
-        url: "#"
+        href: "#"
       }
     ]
   }, {
     label: "Aplicaciones",
-    url: null,
     submenu: [
       {
         label: "Nhexa TV",
         description: "Streaming",
-        url: "#"
+        route: "#"
       }, {
         label: "Nhexa Play",
         description: "Audio y música",
-        url: "#"
+        route: "#"
       }, {
         label: "Nhexa Merch",
         description: "E-commerce",
-        url: "#"
+        route: "#"
       }
     ]
   }, {
     label: "Soporte técnico",
-    url: "#",
+    href: "#",
   }, {
     label: "Contacto",
-    url: "/contact",
+    route: "/contact",
   }
 ];

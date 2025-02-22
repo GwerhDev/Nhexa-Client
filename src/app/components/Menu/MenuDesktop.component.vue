@@ -13,24 +13,47 @@ import { menuList } from './config';
         </router-link>
         <li v-for="(item, index) in menuList" :key="index">
           <div class="label-menu-link">
-            <router-link v-if="item.url" :to="item.url">
+            <router-link v-if="item.route" :to="item.route">
               <p class="pl-2 pr-2 d-flex align-cent gap-1 color-white font-bold">
                 {{ item.label }}
                 <font-awesome-icon v-if="item?.submenu" :icon="['fas', 'chevron-down']" />
               </p>
             </router-link>
+
+            <a v-else-if="item.href" :href="item.href">
+              <p class="pl-2 pr-2 d-flex align-cent gap-1 color-white font-bold">
+                {{ item.label }}
+                <font-awesome-icon v-if="item?.submenu" :icon="['fas', 'chevron-down']" />
+              </p>
+            </a>
+
             <span v-else>
               <p class="pl-2 pr-2 d-flex align-cent gap-1 font-bold">
                 {{ item.label }}
-                <font-awesome-icon v-if="item?.submenu" :icon="['fas', 'chevron-down']" />
+                <font-awesome-icon v-if="item.submenu" :icon="['fas', 'chevron-down']" />
               </p>
             </span>
             <div class="submenu-container">
               <ul v-if="item?.submenu" class="submenu">
                 <li v-for="(subItem, subIndex) in item.submenu" :key="subIndex">
-                  <router-link class="label-submenu-link" :to="subItem?.url">
+                  <a v-if="subItem.href" class="label-submenu-link" :href="subItem.href">
                     <span>
-                      <img :src="subItem?.icon" alt="" height="60">
+                      <img :src="subItem.icon" alt="" height="60">
+                    </span>
+                    <ul>
+                      <li>
+                        {{ subItem.label }}
+                      </li>
+                      <li class="description">
+                        <small>
+                          {{ subItem.description }}
+                        </small>
+                      </li>
+                    </ul>
+                  </a>
+                  <router-link v-if="subItem.route" class="label-submenu-link" :to="subItem.route">
+                    <span>
+                      <img :src="subItem.icon" alt="" height="60">
                     </span>
                     <ul>
                       <li>
