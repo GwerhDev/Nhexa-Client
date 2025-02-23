@@ -7,9 +7,6 @@
   display: none;
   justify-content: flex-start;
   align-items: flex-start;
-  padding-inline: 1rem;
-  padding: 1rem;
-  padding-inline: 2rem;
 }
 
 .logo {
@@ -67,7 +64,8 @@ input {
 
 .logo-container {
   margin: 0;
-  padding: 0;
+  padding: 1rem;
+  padding-inline: 1rem;
   width: 100%;
   display: flex;
   align-items: center;
