@@ -37,7 +37,7 @@ export const menuList: Array<any> = [
         description: "Streaming",
         route: "#"
       }, {
-        label: "Nhexa Pod",
+        label: "Nhexa Spell",
         description: "Audio y música",
         route: "#"
       }, {
