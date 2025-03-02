@@ -1,8 +1,11 @@
 <style scoped lang="scss" src="./MenuMobile.component.scss" />
 <script setup lang="ts">
+import { computed, Ref } from 'vue';
 import { closeMenu } from '../../../helpers/menu';
-import { menuList } from './config';
+import { useStore } from '../../../middlewares/store';
 
+const store = useStore();
+const menuList: Ref<any[]> = computed(() => store.menuList);
 </script>
 
 <template>

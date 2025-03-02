@@ -1,16 +1,20 @@
 import { defineStore } from 'pinia';
-import { getUserData, loginInner, signupInner, updateUserData } from '../services';
+import { getAppList, getMenuList, getUserData, loginInner, signupInner, updateUserData } from '../services';
 import { setUserToken } from '../../helpers';
 
 interface storeState {
   currentUser: any,
   userToken: string,
+  appList: Array<any>,
+  menuList: Array<any>,
 }
 
 export const useStore = defineStore('store', {
   state: (): storeState => ({
     currentUser: {},
     userToken: '',
+    appList: [],
+    menuList: [],
   }),
 
   actions: {
@@ -28,7 +32,7 @@ export const useStore = defineStore('store', {
     },
     async handleLogin(data: any) {
       const userToken = await loginInner(data);
-      if(userToken?.error) return "/auth/error";
+      if (userToken?.error) return "/auth/error";
       setUserToken(userToken);
       const url = '/';
       this.userToken = userToken;
@@ -51,6 +55,14 @@ export const useStore = defineStore('store', {
       this.userToken = token;
       setUserToken(token);
     },
+    async handleGetAppList() {
+      this.appList = await getAppList();
+      return;
+    },
+    async handleGetMenuList() {
+      this.menuList = await getMenuList();
+      return;
+    }
   }
-  
+
 });

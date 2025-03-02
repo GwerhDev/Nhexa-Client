@@ -1,6 +1,10 @@
 <style scoped lang="scss" src="./MenuDesktop.component.scss" />
 <script setup lang="ts">
-import { menuList } from './config';
+import { computed, Ref } from 'vue';
+import { useStore } from '../../../middlewares/store';
+
+const store = useStore();
+const menuList: Ref<any[]> = computed(() => store.menuList);
 
 </script>
 
