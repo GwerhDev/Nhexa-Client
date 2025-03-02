@@ -1,5 +1,17 @@
 <script setup lang="ts">
 import NavBar from './app/components/Navigator/NavBar.component.vue';
+import { onMounted } from 'vue';
+import { getUserToken } from './helpers';
+import { useStore } from './middlewares/store/index';
+
+const store: any = useStore();
+
+onMounted(async () => {
+  const token = getUserToken();
+  if (token) {
+    await store.handleUserData(token);
+  }
+});
 
 </script>
 

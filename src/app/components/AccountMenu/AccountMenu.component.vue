@@ -1,6 +1,6 @@
 <style scoped lang="scss" src="./AccountMenu.component.scss" />
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, onMounted, ref, Ref } from 'vue';
 import { useStore } from '../../../middlewares/store';
 import { ACCOUNTS_URL, CLIENT_URL } from '../../../middlewares/misc/const';
 import { CanvasMenuFunction, closeAccountMenu, closeMenu } from '../../../helpers/menu';
@@ -23,9 +23,15 @@ function select() {
   closeMenu();
 };
 
-const pathAccount: string = `${ACCOUNTS_URL}/auth?token=${userToken.value}`;
-const loginRoute: string = `${ACCOUNTS_URL}/login?callback=${encodeURIComponent(CLIENT_URL)}`;
-const signupRoute: string = `${ACCOUNTS_URL}/register?callback=${encodeURIComponent(CLIENT_URL)}`;
+const pathAccount: Ref<string> = ref('');
+const loginRoute: Ref<string> = ref('');
+const signupRoute: Ref<string> = ref('');
+
+onMounted(() => {
+  loginRoute.value = `${ACCOUNTS_URL}/login?callback=${encodeURIComponent(CLIENT_URL)}`;
+  signupRoute.value = `${ACCOUNTS_URL}/register?callback=${encodeURIComponent(CLIENT_URL)}`;
+  pathAccount.value = `${ACCOUNTS_URL}/auth?token=`;
+});
 
 </script>
 
@@ -49,7 +55,7 @@ const signupRoute: string = `${ACCOUNTS_URL}/register?callback=${encodeURICompon
     </li>
     <div class="separator"></div>
     <li v-if="logged">
-      <a class="menu-text principal-button" :href="pathAccount" @click="select()">
+      <a class="menu-text principal-button" :href="pathAccount + userToken" @click="select()">
         Administrar cuenta
       </a>
     </li>
