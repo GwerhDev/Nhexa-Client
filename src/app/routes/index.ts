@@ -1,8 +1,6 @@
 import { RouteRecordRaw, createRouter, createWebHistory } from 'vue-router';
-import AuthPage from '../pages/AuthPage.vue';
 import LandingPage from '../pages/LandingPage.vue';
 import SupportPage from '../pages/SupportPage.vue';
-import AuthErrorPage from '../pages/AuthErrorPage.vue';
 
 const routes: RouteRecordRaw[] = [
   {
@@ -10,16 +8,6 @@ const routes: RouteRecordRaw[] = [
     name: 'LandingPage',
     component: LandingPage
   },
-  {
-    path: '/auth/error',
-    name: 'AuthErrorPage',
-    component: AuthErrorPage
-  },
-  {
-    path: '/auth',
-    name: 'AuthPage',
-    component: AuthPage
-  }, 
   {
     path: '/support',
     name: 'SupportPage',

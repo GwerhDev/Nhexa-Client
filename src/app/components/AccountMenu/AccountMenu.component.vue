@@ -6,7 +6,6 @@ import { ACCOUNTS_URL, CLIENT_URL } from '../../../middlewares/misc/const';
 import { CanvasMenuFunction, closeAccountMenu, closeMenu } from '../../../helpers/menu';
 
 const store = useStore();
-const userToken: any = computed(() => store.userToken);
 const currentUser: any = computed(() => store.currentUser);
 const logged: any = computed(() => currentUser.value.logged);
 
@@ -30,7 +29,7 @@ const signupRoute: Ref<string> = ref('');
 onMounted(() => {
   loginRoute.value = `${ACCOUNTS_URL}/login?callback=${encodeURIComponent(CLIENT_URL)}`;
   signupRoute.value = `${ACCOUNTS_URL}/register?callback=${encodeURIComponent(CLIENT_URL)}`;
-  pathAccount.value = `${ACCOUNTS_URL}/auth?token=`;
+  pathAccount.value = `${ACCOUNTS_URL}/account/settings`;
 });
 
 </script>
@@ -55,7 +54,7 @@ onMounted(() => {
     </li>
     <div class="separator"></div>
     <li v-if="logged">
-      <a class="menu-text principal-button" :href="pathAccount + userToken" @click="select()">
+      <a class="menu-text principal-button" :href="pathAccount" @click="select()">
         Administrar cuenta
       </a>
     </li>
