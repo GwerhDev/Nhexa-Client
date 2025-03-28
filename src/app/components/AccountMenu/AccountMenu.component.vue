@@ -29,7 +29,7 @@ const signupRoute: Ref<string> = ref('');
 onMounted(() => {
   loginRoute.value = `${ACCOUNTS_URL}/login?callback=${encodeURIComponent(CLIENT_URL)}`;
   signupRoute.value = `${ACCOUNTS_URL}/register?callback=${encodeURIComponent(CLIENT_URL)}`;
-  pathAccount.value = `${ACCOUNTS_URL}/account/settings`;
+  pathAccount.value = `${ACCOUNTS_URL}/`;
 });
 
 </script>
@@ -55,7 +55,7 @@ onMounted(() => {
     <div class="separator"></div>
     <li v-if="logged">
       <a class="menu-text principal-button" :href="pathAccount" @click="select()">
-        Administrar cuenta
+        Centro de cuentas
       </a>
     </li>
     <li v-if="logged">
