@@ -114,7 +114,7 @@
     display: none;
     flex-direction: column;
     backdrop-filter: blur(10px);
-    background: var(--secondary-background-color);
+    background: var(--components-background);
     border: solid 1px rgba(105, 105, 105, 0.705);
     overflow: hidden;
   }
