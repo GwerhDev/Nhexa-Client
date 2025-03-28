@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import NavBar from './app/components/Navigator/NavBar.component.vue';
-import { onMounted, ref } from 'vue';
+import { onMounted } from 'vue';
 import { getUserToken } from './helpers';
 import { useStore } from './middlewares/store/index';
 
