@@ -15,9 +15,11 @@ export const getUserToken = async () => {
   }
 };
 
+export const setUserToken = (token: any) => localStorage.setItem('userToken', token);
+
 export const options = () => {
-  return { 
-    headers: { 
+  return {
+    headers: {
       Authorization: getUserToken()
     }
   }
