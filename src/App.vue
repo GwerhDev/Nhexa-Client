@@ -1,9 +1,7 @@
 <script setup lang="ts">
 import NavBar from './app/components/Navigator/NavBar.component.vue';
 import { onMounted, ref } from 'vue';
-import { setUserToken } from './helpers';
 import { useStore } from './middlewares/store/index';
-import { ACCOUNTS_URL } from './middlewares/misc/const';
 
 const store: any = useStore();
 const authFrame = ref<HTMLIFrameElement | null>(null); // Referencia al iframe
