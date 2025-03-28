@@ -15,6 +15,18 @@ export const getUserToken = async () => {
   }
 };
 
+export const clearUserToken = async () => {
+  try {
+    await fetch(API_URL + "/logout", {
+      method: "GET",
+      credentials: "include"
+    });
+  } catch (error) {
+    console.log(error);
+    return;
+  }
+};
+
 export const setUserToken = (token: any) => localStorage.setItem('userToken', token);
 
 export const options = () => {

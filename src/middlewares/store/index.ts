@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { getAppList, getMenuList, getUserData, loginInner, signupInner, updateUserData } from '../services';
-import { setUserToken } from '../../helpers';
+import { clearUserToken, setUserToken } from '../../helpers';
 
 interface storeState {
   currentUser: any,
@@ -19,7 +19,7 @@ export const useStore = defineStore('store', {
 
   actions: {
     logout() {
-      localStorage.clear();
+      clearUserToken();
       this.currentUser = {};
       this.userToken = '';
     },
