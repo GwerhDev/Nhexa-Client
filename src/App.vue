@@ -9,23 +9,10 @@ const store: any = useStore();
 const authFrame = ref<HTMLIFrameElement | null>(null); // Referencia al iframe
 
 onMounted(async () => {
-  authFrame.value = document.createElement("iframe");
-  authFrame.value.src = ACCOUNTS_URL + "/embed-session";
-  authFrame.value.style.display = "none";
-  document.body.appendChild(authFrame.value);
-
-  window.addEventListener("message", async (event) => {
-    if (event.origin !== ACCOUNTS_URL) return;
-
-    const { userToken } = event.data;
-    if (userToken) {
-      setUserToken(userToken);
-      await store.handleUserData(userToken);
-    } else {
-      console.error("No hay sesión activa.");
-    }
-  });
+  const token: any = await getUserToken();
+  token && store.handleUserData(token);
 });
+
 </script>
 
 <template>
