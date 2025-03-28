@@ -19,7 +19,7 @@
   padding: 0;
   display: flex;
   width: 100%;
-  background: var(--secondary-semitransparent-background-color);
+  background: var(--components-background);
   backdrop-filter: blur(10px);
   border-radius: .5rem;
 }
@@ -39,7 +39,7 @@
     justify-content: flex-end;
     align-items: center;
     border-radius: .5rem;
-    background: var(--secondary-semitransparent-background-color);
+    background: var(--components-background);
 
     input {
       width: 100%;
