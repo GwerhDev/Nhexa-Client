@@ -16,13 +16,13 @@
 
 .submenu-mobile-container {
   width: 100%;
-  
+
   .submenu-mobile {
     width: 100%;
     display: flex;
     flex-direction: column;
     gap: .5rem;
-    
+
     li {
       color: var(--nhexa-white);
       display: flex;
@@ -45,5 +45,27 @@
 .mobile-description {
   small {
     color: rgb(168, 168, 168);
+  }
+}
+
+.loader-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.empty-submenu-mobile {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+
+  li {
+    text-align: center;
+    height: 40px;
+    width: 100%;
   }
 }

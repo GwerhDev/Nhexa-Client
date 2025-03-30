@@ -3,6 +3,8 @@
 import { computed, Ref } from 'vue';
 import { closeMenu } from '../../../helpers/menu';
 import { useStore } from '../../../middlewares/store';
+import Loader from '../Loaders/Loader.component.vue';
+import SkeletonLoader from '../Loaders/SkeletonLoader.component.vue';
 
 const store = useStore();
 const menuList: Ref<any[]> = computed(() => store.menuList);
@@ -10,7 +12,7 @@ const menuList: Ref<any[]> = computed(() => store.menuList);
 
 <template>
   <div class="container-menu-mobile">
-    <ul class="ul-menu-mobile">
+    <ul class="ul-menu-mobile" v-if="menuList.length">
       <li v-for="item in menuList" :key="item.label">
         <div class="mobile-menu-link">
           <router-link v-if="item.route" :to="item.route" @click="closeMenu()">
@@ -73,5 +75,21 @@ const menuList: Ref<any[]> = computed(() => store.menuList);
         </div>
       </li>
     </ul>
+    <div class="loader-container" v-else>
+      <ul class="empty-submenu-mobile">
+        <li>
+          <SkeletonLoader />
+        </li>
+        <li>
+          <SkeletonLoader />
+        </li>
+        <li>
+          <SkeletonLoader />
+        </li>
+        <li>
+          <Loader />
+        </li>
+      </ul>
+    </div>
   </div>
 </template>
