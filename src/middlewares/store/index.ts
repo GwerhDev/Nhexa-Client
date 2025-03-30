@@ -1,10 +1,9 @@
 import { defineStore } from 'pinia';
-import { getAppList, getMenuList, getUserData, loginInner, signupInner, updateUserData } from '../services';
-import { clearUserToken, setUserToken } from '../../helpers';
+import { getAppList, getMenuList, getUserData } from '../services';
+import { clearUserToken } from '../services/token';
 
 interface storeState {
   currentUser: any,
-  userToken: string,
   appList: Array<any>,
   menuList: Array<any>,
 }
@@ -12,7 +11,6 @@ interface storeState {
 export const useStore = defineStore('store', {
   state: (): storeState => ({
     currentUser: {},
-    userToken: '',
     appList: [],
     menuList: [],
   }),
@@ -21,48 +19,26 @@ export const useStore = defineStore('store', {
     logout() {
       clearUserToken();
       this.currentUser = {};
-      this.userToken = '';
+
     },
-    async handleRegister(data: any) {
-      const userToken = await signupInner(data);
-      setUserToken(userToken);
-      const url = '/auth/' + userToken;
-      this.userToken = userToken;
-      return url;
-    },
-    async handleLogin(data: any) {
-      const userToken = await loginInner(data);
-      if (userToken?.error) return "/auth/error";
-      setUserToken(userToken);
-      const url = '/';
-      this.userToken = userToken;
-      return url;
-    },
-    async handleUserData(token: any, router: any) {
+
+    async handleUserData(router: any) {
       try {
-        setUserToken(token);
-        this.userToken = token;
-        this.currentUser = await getUserData(token);
+        this.currentUser = await getUserData();
         router && router.push('/');
       } catch (error) {
-        localStorage.clear();
         console.error(error);
       }
     },
-    async handleUpdateUserData(formData: any, id: any, token: any) {
-      await updateUserData(formData, id, token);
-      this.currentUser = await getUserData(token);
-      this.userToken = token;
-      setUserToken(token);
-    },
+
     async handleGetAppList() {
       this.appList = await getAppList();
       return;
     },
+
     async handleGetMenuList() {
       this.menuList = await getMenuList();
       return;
     }
   }
-
 });
