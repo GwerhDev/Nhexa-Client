@@ -16,7 +16,7 @@ export const getMenuList: any = async () => {
   return response;
 };
 
-export const getUserData: any = async (token: any) => {
+export const getUserData: any = async () => {
   const response: any = await axios.get(API_URL + "/account", { withCredentials: true })
     .then(response => response.data)
   return response;
