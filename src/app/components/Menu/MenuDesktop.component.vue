@@ -2,6 +2,7 @@
 <script setup lang="ts">
 import { computed, Ref } from 'vue';
 import { useStore } from '../../../middlewares/store';
+import SkeletonLoader from '../Loaders/SkeletonLoader.component.vue';
 
 const store = useStore();
 const menuList: Ref<any[]> = computed(() => store.menuList);
@@ -11,7 +12,7 @@ const menuList: Ref<any[]> = computed(() => store.menuList);
 <template>
   <div class="container-menu-desk">
     <div class="inner-container">
-      <ul class="ul-menu-desktop" v-if="menuList">
+      <ul class="ul-menu-desktop" v-if="menuList.length">
         <router-link class="label-menu-link pl-2 pr-2" id="first" to="/">
           <font-awesome-icon :icon="['fas', 'house']" />
         </router-link>
@@ -75,6 +76,9 @@ const menuList: Ref<any[]> = computed(() => store.menuList);
             </div>
           </div>
         </li>
+      </ul>
+      <ul class="ul-menu-desktop" v-else>
+        <SkeletonLoader />
       </ul>
 
       <ul class="ul-search">

@@ -3,7 +3,7 @@
 import { onMounted, computed, Ref } from 'vue';
 import { useStore } from '../../../middlewares/store';
 import { CanvasMenuFunction, closeAccountMenu, closeMenu } from '../../../helpers/menu';
-import Loader from '../Loader/Loader.component.vue';
+import Loader from '../Loaders/Loader.component.vue';
 
 const store = useStore();
 const appList: Ref<any[]> = computed(() => store.appList);
