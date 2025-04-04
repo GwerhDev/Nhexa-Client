@@ -97,12 +97,16 @@ input {
 
 @media (max-width: 1080px) {
   .nav-menu-ul {
-    padding-inline: 2rem;
     width: 100%;
     display: flex;
     align-items: center;
     flex-direction: column;
     justify-content: center;
+
+    .logo-cont,
+    .user-button {
+      padding-inline: 1rem;
+    }
   }
 
   .menu-mobile-container {
