@@ -36,6 +36,11 @@ onMounted(() => {
 
 <template>
   <ul class="account-menu-container" id="account-menu-container">
+    <li class="current-user-data" v-if="!logged">
+      <font-awesome-icon icon="fa-solid fa-user" size="2x" />
+      <h4>Cuenta</h4>
+    </li>
+    <div class="separator" v-if="!logged"></div>
     <li v-if="!logged">
       <a class="menu-text principal-button" :href="loginRoute" @click="select()">
         Iniciar sesión
@@ -49,10 +54,10 @@ onMounted(() => {
     <li class="current-user-data" v-if="logged">
       <h2>{{ currentUser?.userData?.username }}</h2>
       <img v-if="currentUser?.userData?.profilePic" :src="currentUser?.userData?.profilePic" alt="">
-      <font-awesome-icon v-else icon="fa-solid fa-user" />
+      <font-awesome-icon v-else icon="fa-solid fa-user" size="2x" />
       <p>{{ currentUser?.userData?.role }}</p>
     </li>
-    <div class="separator"></div>
+    <div class="separator" v-if="logged"></div>
     <li v-if="logged">
       <a class="menu-text principal-button" :href="pathAccount" @click="select()">
         Centro de cuentas
