@@ -85,6 +85,10 @@
       display: flex;
     }
   }
+
+  &.router-link-exact-active {
+    background-color: var(--menu-hover-color);
+  }
 }
 
 .label-submenu-link {
@@ -121,7 +125,8 @@
 }
 
 .description {
-  color: rgb(168, 168, 168);;
+  color: rgb(168, 168, 168);
+  ;
 }
 
 #first {
