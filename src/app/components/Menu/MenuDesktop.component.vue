@@ -58,7 +58,7 @@ const menuList: Ref<any[]> = computed(() => store.menuList);
                   </a>
                   <router-link v-if="subItem.route" class="label-submenu-link" :to="subItem.route">
                     <span>
-                      <img :src="subItem.icon" alt="" height="60">
+                      <img :src="subItem.icon" alt="" height="30">
                     </span>
                     <ul>
                       <li>
