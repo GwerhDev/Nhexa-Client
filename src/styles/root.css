@@ -32,5 +32,25 @@
   --button-primary-color: #5086b0;
   --button-primary-hover-color: #699fb8;
   --components-background: #2d3337ba;
+  --components-background-solid: #2d3337;
   --special-color: #33223a;
+  --footer-background: #10141870;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100vh;
+  color: var(--nhexa-white);
+  display: flex;
+  overflow-x: hidden;
+}
+
+#app {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
 }
