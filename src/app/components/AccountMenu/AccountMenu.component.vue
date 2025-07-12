@@ -8,6 +8,7 @@ import { CanvasMenuFunction, closeAccountMenu, closeMenu } from '../../../helper
 const store = useStore();
 const currentUser: any = computed(() => store.currentUser);
 const logged: any = computed(() => currentUser.value.logged);
+const appList: any = computed(() => store.appList.admin);
 
 CanvasMenuFunction("#account-menu-container");
 
@@ -57,6 +58,13 @@ onMounted(() => {
       <font-awesome-icon v-else icon="fa-solid fa-user" size="2x" />
       <p>{{ currentUser?.userData?.role }}</p>
     </li>
+    <div class="role-functions" v-if="appList?.length">
+      <li v-for="item in appList" :key="item.label">
+        <a :href="item.url" @click="select">
+          <img :src="item.icon" alt="" width="24" height="24">
+        </a>
+      </li>
+    </div>
     <div class="separator" v-if="logged"></div>
     <li v-if="logged">
       <a class="menu-text principal-button" :href="pathAccount" @click="select()">

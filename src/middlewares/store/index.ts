@@ -4,14 +4,14 @@ import { clearUserToken } from '../services/token';
 
 interface storeState {
   currentUser: any,
-  appList: Array<any>,
+  appList: { user: Array<any>, admin?: Array<any> },
   menuList: Array<any>,
 }
 
 export const useStore = defineStore('store', {
   state: (): storeState => ({
     currentUser: {},
-    appList: [],
+    appList: { user: [], admin: [] },
     menuList: [],
   }),
 
