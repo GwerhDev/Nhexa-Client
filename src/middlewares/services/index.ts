@@ -10,7 +10,7 @@ export const getAppList: any = async () => {
 };
 
 export const getMenuList: any = async () => {
-  const response: any = await axios.get(API_URL + "/menu-list/nhexa")
+  const response: any = await axios.get(STREAMBY_URL + "/menu-list")
     .then(response => response.data)
     .catch(() => { return { error: error.api.loadItemById } });
   return response;
