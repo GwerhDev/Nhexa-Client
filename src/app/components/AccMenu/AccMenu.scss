@@ -60,10 +60,11 @@
 }
 
 .profile-pic {
-  width: 1.5rem;
-  height: 1.5rem;
+  width: 1.3rem;
+  height: 1.3rem;
   border: solid;
-  border-width: .1rem;
+  border-width: .15rem;
   border-radius: 100%;
   border-color: var(--primary-color);
+  cursor: pointer;
 }
