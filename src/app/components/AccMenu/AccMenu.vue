@@ -51,9 +51,9 @@ onUnmounted(() => {
 
 <template>
   <span class="acc-menu-button" ref="accMenuButton">
-    <font-awesome-icon class="icon" v-if="!currentUser?.userData?.profilePic" icon="fa-solid fa-user"
-      @click="toggleDropdown" />
     <div class="profile-pic-container">
+      <font-awesome-icon class="icon" v-if="!currentUser?.userData?.profilePic" icon="fa-solid fa-user"
+        @click="toggleDropdown" />
       <img class="profile-pic" v-if="currentUser?.userData?.profilePic" :src="currentUser?.userData?.profilePic"
         @click="toggleDropdown" alt="">
     </div>
