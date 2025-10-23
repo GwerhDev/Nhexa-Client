@@ -3,7 +3,6 @@
 import { computed, Ref } from 'vue';
 import { closeMenu } from '../../../helpers/menu';
 import { useStore } from '../../../middlewares/store';
-import Loader from '../Loaders/Loader.component.vue';
 import SkeletonLoader from '../Loaders/SkeletonLoader.component.vue';
 
 const store = useStore();
@@ -85,9 +84,6 @@ const menuList: Ref<any[]> = computed(() => store.menuList);
         </li>
         <li>
           <SkeletonLoader />
-        </li>
-        <li>
-          <Loader />
         </li>
       </ul>
     </div>
