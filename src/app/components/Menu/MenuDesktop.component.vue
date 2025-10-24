@@ -18,7 +18,7 @@ const menuList: Ref<any[]> = computed(() => store.menuList);
         </router-link>
         <li v-for="(item, index) in menuList" :key="index">
           <div class="label-menu-link">
-            <router-link v-if="item.route" :to="item.route">
+            <router-link v-if="item.route || item.id" :to="item.route || item.id">
               <p class="pl-2 pr-2 d-flex align-cent gap-1 color-white font-bold">
                 {{ item.label }}
                 <font-awesome-icon v-if="item?.submenu" :icon="['fas', 'chevron-down']" />
