@@ -2,12 +2,13 @@
 import NavBar from './app/components/Navigator/NavBar.component.vue';
 import FooterComponent from './app/components/Footer/Footer.component.vue';
 import { onMounted } from 'vue';
-import { useStore } from './middlewares/store/index';
-
+import { useStore } from './middlewares/store';
 const store: any = useStore();
 
-onMounted(async () => {
+onMounted(() => {
   store.handleUserData();
+  store.handleGetAppList();
+  store.handleGetMenuList();
 });
 
 </script>

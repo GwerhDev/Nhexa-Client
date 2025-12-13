@@ -12,10 +12,6 @@ function select() {
   closeMenu();
 };
 
-onMounted(() => {
-  store.handleGetAppList();
-});
-
 const showDropdown = ref(false);
 const appMenuButton = ref<HTMLSpanElement | null>(null);
 
