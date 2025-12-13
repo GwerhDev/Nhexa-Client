@@ -9,6 +9,7 @@ const store = useStore();
 const currentUser: any = computed(() => store.currentUser);
 const logged: any = computed(() => currentUser.value.logged);
 const appList: any = computed(() => store.appList.admin);
+const isLoading = computed(() => store.isLoading);
 
 function logout() {
   store.logout();
@@ -52,10 +53,13 @@ onUnmounted(() => {
 <template>
   <span class="acc-menu-button" ref="accMenuButton">
     <div class="profile-pic-container">
-      <font-awesome-icon class="icon" v-if="!currentUser?.userData?.profilePic" icon="fa-solid fa-user"
-        @click="toggleDropdown" />
-      <img class="profile-pic" v-if="currentUser?.userData?.profilePic" :src="currentUser?.userData?.profilePic"
-        @click="toggleDropdown" alt="">
+      <font-awesome-icon class="icon" v-if="isLoading" icon="fa-solid fa-spinner" spin />
+      <template v-else>
+        <font-awesome-icon class="icon" v-if="!currentUser?.userData?.profilePic" icon="fa-solid fa-user"
+          @click="toggleDropdown" />
+        <img class="profile-pic" v-if="currentUser?.userData?.profilePic" :src="currentUser?.userData?.profilePic"
+          @click="toggleDropdown" alt="">
+      </template>
     </div>
     <div class="dropdown" v-if="showDropdown">
       <ul class="acc-menu-container">

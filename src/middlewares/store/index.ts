@@ -6,6 +6,7 @@ interface storeState {
   currentUser: any,
   appList: { user: Array<any>, admin?: Array<any> },
   menuList: Array<any>,
+  isLoading: boolean,
 }
 
 export const useStore = defineStore('store', {
@@ -13,6 +14,7 @@ export const useStore = defineStore('store', {
     currentUser: {},
     appList: { user: [], admin: [] },
     menuList: [],
+    isLoading: false,
   }),
 
   actions: {
@@ -23,11 +25,14 @@ export const useStore = defineStore('store', {
     },
 
     async handleUserData(router: any) {
+      this.isLoading = true;
       try {
         this.currentUser = await getUserData();
         router && router.push('/');
       } catch (error) {
         console.error(error);
+      } finally {
+        this.isLoading = false;
       }
     },
 
