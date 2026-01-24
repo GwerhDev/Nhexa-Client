@@ -21,6 +21,7 @@
 import { defineComponent } from 'vue';
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import logoUrl from "../../../assets/logo.glb";
 
 export default defineComponent({
   name: 'HeroBannerComponent',
@@ -52,11 +53,10 @@ export default defineComponent({
     // Model
     const loader = new GLTFLoader();
     loader.load(
-      "/src/assets/logo.glb",
+      logoUrl,
       (gltf) => {
         model = gltf.scene;
         scene.add(model);
-        console.log('Model loaded:', model);
       },
       undefined,
       (error) => {

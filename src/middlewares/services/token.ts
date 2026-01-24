@@ -10,7 +10,7 @@ export const getUserToken = async () => {
     return userToken;
 
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return null;
   }
 };
@@ -22,7 +22,7 @@ export const clearUserToken = async () => {
       credentials: "include"
     });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return;
   }
 };
