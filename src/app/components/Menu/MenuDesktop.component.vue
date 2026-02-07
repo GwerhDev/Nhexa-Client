@@ -13,7 +13,7 @@ const menuList: Ref<any[]> = computed(() => store.menuList);
   <div class="container-menu-desk">
     <div class="inner-container">
       <ul class="ul-menu-desktop" v-if="menuList.length">
-        <router-link class="label-menu-link pl-2 pr-2" id="first" to="/">
+        <router-link class="label-menu-link pl-2 pr-2" id="first" to="/#home">
           <font-awesome-icon :icon="['fas', 'house']" />
         </router-link>
         <li v-for="(item, index) in menuList" :key="index">
