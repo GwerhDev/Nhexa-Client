@@ -21,7 +21,7 @@
 import { defineComponent } from 'vue';
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
-import logoUrl from "../../../assets/logo.glb";
+import logoUrl from "../../../assets/logo2.glb";
 
 export default defineComponent({
   name: 'HeroBannerComponent',
