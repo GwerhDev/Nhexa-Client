@@ -10,9 +10,7 @@
           <b>medios interactivos</b>, en retroalimentación abierta con las <b>comunidades</b> a las que estos estén dirigidos.</p>
         <button>Saber más...</button>
       </section>
-      <section class="section-right" ref="container">
-        
-      </section>
+      <section class="section-right" ref="container"></section>
     </div>
   </div>
 </template>
@@ -21,7 +19,7 @@
 import { defineComponent } from 'vue';
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
-import logoUrl from "../../../assets/logo2.glb";
+import logoUrl from "../../../assets/logo.glb";
 
 export default defineComponent({
   name: 'HeroBannerComponent',
@@ -29,7 +27,8 @@ export default defineComponent({
     let scene: THREE.Scene,
       camera: THREE.PerspectiveCamera,
       renderer: THREE.WebGLRenderer,
-      model: THREE.Group;
+      model: THREE.Group,
+      mouseLight: THREE.PointLight;
 
     const container = this.$refs.container as HTMLElement;
 
@@ -43,11 +42,14 @@ export default defineComponent({
       0.1,
       1000
     );
-    camera.position.z = 4;
+    camera.position.z = 5;
 
     // Renderer
     renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
     renderer.setSize(container.clientWidth, container.clientHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1;
     container.appendChild(renderer.domElement);
 
     // Model
@@ -56,6 +58,34 @@ export default defineComponent({
       logoUrl,
       (gltf) => {
         model = gltf.scene;
+        model.rotation.x = 0;
+        model.rotation.y = 0;
+
+        // Center model and fit camera to its bounding box
+        const box = new THREE.Box3().setFromObject(model);
+        const center = box.getCenter(new THREE.Vector3());
+        const size = box.getSize(new THREE.Vector3());
+        model.position.sub(center);
+
+        const maxDim = Math.max(size.x, size.y, size.z);
+        const fov = camera.fov * (Math.PI / 180);
+        camera.position.z = (maxDim / 2) / Math.tan(fov / 2) * 1.4;
+        camera.updateProjectionMatrix();
+
+        model.traverse((child) => {
+          if ((child as THREE.Mesh).isMesh) {
+            const mesh = child as THREE.Mesh;
+            const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+            materials.forEach((mat) => {
+              if (mat instanceof THREE.MeshStandardMaterial) {
+                mat.roughness = 0.3;
+                mat.metalness = 0.2;
+                mat.needsUpdate = true;
+              }
+            });
+          }
+        });
+
         scene.add(model);
       },
       undefined,
@@ -64,55 +94,88 @@ export default defineComponent({
       }
     );
 
-    // Light
-    const ambientLight = new THREE.AmbientLight(0xffffff, 1);
+    // Base lights
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.15);
     scene.add(ambientLight);
 
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 2);
+    const frontLight = new THREE.DirectionalLight(0xffffff, 0.3);
+    frontLight.position.set(0, 0, 5);
+    scene.add(frontLight);
+
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.2);
     directionalLight.position.set(5, 5, 5);
     scene.add(directionalLight);
 
-    const pointLight = new THREE.PointLight(0xffffff, 1);
-    pointLight.position.set(-5, -5, -5);
-    scene.add(pointLight);
+    const fillLight = new THREE.DirectionalLight(0xffffff, 0.1);
+    fillLight.position.set(-5, -3, 2);
+    scene.add(fillLight);
+
+    // Mouse-following accent light
+    mouseLight = new THREE.PointLight(0xffffff, 8, 15);
+    mouseLight.position.set(0, 0, 3);
+    scene.add(mouseLight);
 
     // Animation
     const animate = () => {
       requestAnimationFrame(animate);
       renderer.render(scene, camera);
     };
-
     animate();
 
-    // Mouse move event
-    const onMouseMove = (event: MouseEvent) => {
-      if (model) {
-        const rect = container.getBoundingClientRect();
-        const mouseX = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-        const mouseY = -(((event.clientY - rect.top) / rect.height) * 2 - 1);
+    // Drag rotation state
+    let isDragging = false;
+    let prevMouseX = 0;
+    let prevMouseY = 0;
 
-        model.rotation.y = mouseX * 0.5;
-        model.rotation.x = mouseY * 0.5;
+    const onMouseDown = (event: MouseEvent) => {
+      isDragging = true;
+      prevMouseX = event.clientX;
+      prevMouseY = event.clientY;
+      container.style.cursor = 'grabbing';
+    };
+
+    const onMouseMove = (event: MouseEvent) => {
+      const rect = container.getBoundingClientRect();
+      const mouseX = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+      const mouseY = -(((event.clientY - rect.top) / rect.height) * 2 - 1);
+
+      // Light always follows mouse
+      mouseLight.position.x = mouseX * 3;
+      mouseLight.position.y = mouseY * 3;
+
+      // Rotate model only while dragging
+      if (isDragging && model) {
+        const deltaX = event.clientX - prevMouseX;
+        const deltaY = event.clientY - prevMouseY;
+        model.rotation.y += deltaX * 0.01;
+        model.rotation.x += deltaY * 0.01;
+        prevMouseX = event.clientX;
+        prevMouseY = event.clientY;
       }
+    };
+
+    const onMouseUp = () => {
+      isDragging = false;
+      container.style.cursor = 'grab';
     };
 
     const onMouseLeave = () => {
-      if (model) {
-        model.rotation.y = 0;
-        model.rotation.x = 0;
-      }
+      isDragging = false;
+      container.style.cursor = 'grab';
+      mouseLight.position.set(0, 0, 3);
     };
 
+    container.style.cursor = 'grab';
+    container.addEventListener('mousedown', onMouseDown);
     container.addEventListener('mousemove', onMouseMove);
+    container.addEventListener('mouseup', onMouseUp);
     container.addEventListener('mouseleave', onMouseLeave);
 
     // Handle window resize
-    window.addEventListener("resize", () => {
-      if (container) {
-        camera.aspect = container.clientWidth / container.clientHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(container.clientWidth, container.clientHeight);
-      }
+    window.addEventListener('resize', () => {
+      camera.aspect = container.clientWidth / container.clientHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(container.clientWidth, container.clientHeight);
     });
   },
 });
