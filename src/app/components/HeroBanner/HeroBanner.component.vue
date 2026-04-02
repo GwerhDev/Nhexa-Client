@@ -124,15 +124,68 @@ export default defineComponent({
     mouseLight.position.set(0, 0, 3);
     scene.add(mouseLight);
 
+    // Particles
+    const PARTICLE_COUNT = 60;
+    const particlePositions = new Float32Array(PARTICLE_COUNT * 3);
+    const particleVelocities: THREE.Vector3[] = [];
+
+    const spawnParticle = (i: number) => {
+      const theta = Math.random() * Math.PI * 2;
+      const phi = Math.acos(2 * Math.random() - 1);
+      const r = 2.5 + Math.random() * 1.5;
+      particlePositions[i * 3]     = r * Math.sin(phi) * Math.cos(theta);
+      particlePositions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
+      particlePositions[i * 3 + 2] = r * Math.cos(phi);
+      particleVelocities[i] = new THREE.Vector3(
+        -particlePositions[i * 3],
+        -particlePositions[i * 3 + 1],
+        -particlePositions[i * 3 + 2]
+      ).normalize().multiplyScalar(0.004 + Math.random() * 0.003);
+    };
+
+    for (let i = 0; i < PARTICLE_COUNT; i++) spawnParticle(i);
+
+    const particleGeometry = new THREE.BufferGeometry();
+    particleGeometry.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
+
+    const particleMaterial = new THREE.PointsMaterial({
+      color: 0xffffff,
+      size: 0.04,
+      transparent: true,
+      opacity: 0.55,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      sizeAttenuation: true,
+    });
+
+    const particleSystem = new THREE.Points(particleGeometry, particleMaterial);
+    scene.add(particleSystem);
+
     // Animation
+    let isDragging = false;
+
     const animate = () => {
       requestAnimationFrame(animate);
+
+      // Slow idle rotation when not dragging
+      if (!isDragging && model) {
+        model.rotation.y += 0.002;
+      }
+
+      // Update particle positions
+      const pos = particleGeometry.attributes.position.array as Float32Array;
+      for (let i = 0; i < PARTICLE_COUNT; i++) {
+        pos[i * 3]     += particleVelocities[i].x;
+        pos[i * 3 + 1] += particleVelocities[i].y;
+        pos[i * 3 + 2] += particleVelocities[i].z;
+        const dist = Math.sqrt(pos[i * 3] ** 2 + pos[i * 3 + 1] ** 2 + pos[i * 3 + 2] ** 2);
+        if (dist < 0.25) spawnParticle(i);
+      }
+      particleGeometry.attributes.position.needsUpdate = true;
+
       renderer.render(scene, camera);
     };
     animate();
-
-    // Drag rotation state
-    let isDragging = false;
     let prevMouseX = 0;
     let prevMouseY = 0;
 
