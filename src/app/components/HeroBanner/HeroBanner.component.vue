@@ -10,7 +10,9 @@
           <b>medios interactivos</b>, en retroalimentación abierta con las <b>comunidades</b> a las que estos estén dirigidos.</p>
         <button>Saber más...</button>
       </section>
-      <section class="section-right" ref="container"></section>
+      <section class="section-right" ref="container">
+        <SpinnerLoaderComponent v-if="loading" />
+      </section>
     </div>
   </div>
 </template>
@@ -20,9 +22,14 @@ import { defineComponent } from 'vue';
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import logoUrl from "../../../assets/logo.glb";
+import SpinnerLoaderComponent from '../Loaders/SpinnerLoader.component.vue';
 
 export default defineComponent({
   name: 'HeroBannerComponent',
+  components: { SpinnerLoaderComponent },
+  data() {
+    return { loading: true };
+  },
   mounted() {
     let scene: THREE.Scene,
       camera: THREE.PerspectiveCamera,
@@ -87,10 +94,12 @@ export default defineComponent({
         });
 
         scene.add(model);
+        this.loading = false;
       },
       undefined,
       (error) => {
         console.error('Error loading model:', error);
+        this.loading = false;
       }
     );
 
