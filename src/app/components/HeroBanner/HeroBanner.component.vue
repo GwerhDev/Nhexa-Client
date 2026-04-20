@@ -23,7 +23,7 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import SpinnerLoaderComponent from '../Loaders/SpinnerLoader.component.vue';
 
-const logoUrl = "https://streamby.s3.sa-east-1.amazonaws.com/68e0e3e992756fbbd2478f2e/3d-models/logo.glb";
+const logoUrl = "https://streamby.s3.sa-east-1.amazonaws.com/68e0e3e992756fbbd2478f2e/3d-models/db9b755a-b5a1-462d-95d9-1a2bd6004511.glb";
 
 export default defineComponent({
   name: 'HeroBannerComponent',
