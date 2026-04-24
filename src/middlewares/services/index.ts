@@ -1,9 +1,10 @@
 import axios from "axios";
-import { API_URL, STREAMBY_URL } from "../misc/const";
+import api from "./api";
+import { STREAMBY_URL } from "../misc/const";
 import { error } from "../misc/errors";
 
 export const getAppList: any = async () => {
-  const response: any = await axios.get(API_URL + "/app-list", { withCredentials: true })
+  const response: any = await api.get("/app-list")
     .then(response => response.data)
     .catch(() => { return { error: error.api.loadItemById } });
   return response;
@@ -17,7 +18,7 @@ export const getMenuList: any = async () => {
 };
 
 export const getUserData: any = async () => {
-  const response: any = await axios.get(API_URL + "/account", { withCredentials: true })
+  const response: any = await api.get("/account")
     .then(response => response.data)
   return response;
 };
