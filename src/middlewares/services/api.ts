@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { API_URL, ACCOUNTS_URL } from '../misc/const';
+import { API_URL } from '../misc/const';
 
 const api = axios.create({
   baseURL: API_URL,
@@ -38,7 +38,6 @@ api.interceptors.response.use(
       return api(original);
     } catch (refreshError) {
       drainQueue(refreshError);
-      window.location.href = `${ACCOUNTS_URL}/login`;
       return Promise.reject(refreshError);
     } finally {
       isRefreshing = false;
