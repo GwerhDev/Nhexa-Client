@@ -4,7 +4,7 @@ import { STREAMBY_URL } from "../misc/const";
 import { error } from "../misc/errors";
 
 export const getAppList: any = async () => {
-  const response: any = await api.get("/app-list")
+  const response: any = await axios.get(STREAMBY_URL + "/app-list", { withCredentials: true })
     .then(response => response.data)
     .catch(() => { return { error: error.api.loadItemById } });
   return response;
