@@ -1,18 +1,26 @@
 <style scoped lang="scss" src="./MenuDesktop.component.scss" />
 <script setup lang="ts">
-import { computed, Ref } from 'vue';
+import { computed, ref, Ref } from 'vue';
 import { useStore } from '../../../middlewares/store';
 import { scrollToTop } from '../../../helpers/menu';
+import { useRouter } from 'vue-router';
 import SkeletonLoader from '../Loaders/SkeletonLoader.component.vue';
 
 const store = useStore();
+const router = useRouter();
 const menuList: Ref<any[]> = computed(() => store.menuList);
 
-// A menu item is active when its section anchor matches the section currently
-// in view (scroll-spy). e.g. item.section "/#apps" matches activeSection "apps".
 const isActive = (section?: string): boolean =>
   !!section && !!store.activeSection && section.endsWith('#' + store.activeSection);
 
+const query = ref('');
+
+function search() {
+  const text = query.value.trim();
+  if (!text) return;
+  query.value = '';
+  router.push({ path: '/search', query: { text } });
+}
 </script>
 
 <template>
@@ -89,8 +97,8 @@ const isActive = (section?: string): boolean =>
 
       <ul class="ul-search">
         <li>
-          <input type="text" placeholder="Buscar...">
-          <button>
+          <input type="text" placeholder="Buscar..." v-model="query" @keyup.enter="search">
+          <button @click="search">
             <font-awesome-icon :icon="['fas', 'magnifying-glass']" />
           </button>
         </li>

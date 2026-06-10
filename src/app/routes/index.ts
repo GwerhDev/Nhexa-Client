@@ -1,11 +1,17 @@
 import { RouteRecordRaw, createRouter, createWebHistory } from 'vue-router';
 import LandingPage from '../pages/LandingPage.vue';
+import SearchPage from '../pages/SearchPage.vue';
 
 const routes: RouteRecordRaw[] = [
   {
     path: '/',
     name: 'LandingPage',
     component: LandingPage
+  },
+  {
+    path: '/search',
+    name: 'SearchPage',
+    component: SearchPage
   },
 ]
 

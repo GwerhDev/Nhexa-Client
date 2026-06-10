@@ -1,16 +1,79 @@
 <style scoped lang="scss" src="./MenuMobile.component.scss" />
+<style scoped>
+.mobile-search {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 56px;
+  margin-bottom: .75rem;
+  background: var(--components-background);
+  backdrop-filter: blur(200px);
+  border-radius: .5rem;
+  padding-inline: .25rem;
+}
+
+.mobile-search input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding-inline: 1rem;
+  color: var(--nhexa-white);
+}
+
+.mobile-search input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.mobile-search input:focus,
+.mobile-search input:focus-visible {
+  border: none;
+  outline: none;
+}
+
+.mobile-search button {
+  border: none;
+  background: transparent;
+  color: var(--nhexa-white);
+  padding-inline: .75rem;
+  cursor: pointer;
+}
+</style>
 <script setup lang="ts">
-import { computed, Ref } from 'vue';
+import { computed, ref, Ref } from 'vue';
 import { closeMenu } from '../../../helpers/menu';
 import { useStore } from '../../../middlewares/store';
+import { useRouter } from 'vue-router';
 import SkeletonLoader from '../Loaders/SkeletonLoader.component.vue';
 
 const store = useStore();
+const router = useRouter();
 const menuList: Ref<any[]> = computed(() => store.menuList);
+
+const query = ref('');
+
+function search() {
+  const text = query.value.trim();
+  if (!text) return;
+  query.value = '';
+  closeMenu();
+  router.push({ path: '/search', query: { text } });
+}
 </script>
 
 <template>
   <div class="container-menu-mobile">
+    <div class="mobile-search">
+      <input
+        type="text"
+        placeholder="Buscar..."
+        v-model="query"
+        @keyup.enter="search"
+      >
+      <button type="button" @click="search">
+        <font-awesome-icon :icon="['fas', 'magnifying-glass']" />
+      </button>
+    </div>
+
     <ul class="ul-menu-mobile" v-if="menuList.length">
       <li v-for="item in menuList" :key="item.label">
         <div class="mobile-menu-link">
