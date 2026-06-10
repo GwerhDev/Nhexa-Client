@@ -196,9 +196,16 @@
 .main-container {
   width: 100%;
   max-width: 2000px;
+  padding-inline: 1.5rem;
   display: flex;
   align-items: center;
   flex-direction: column;
+}
+
+@media (max-width: 1080px) {
+  .main-container {
+    padding-inline: .5rem;
+  }
 }
 
 .router-view {
@@ -207,7 +214,6 @@
   align-items: center;
   flex-direction: column;
   background-attachment: fixed;
-  padding-inline: 1rem;
 }
 
 /* Padding is included in the width so sections never overflow the viewport. */
