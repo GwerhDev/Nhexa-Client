@@ -220,12 +220,6 @@
   width: 100%;
 }
 
-/* Snap targets (proximity, set on :root). The first section (hero) is excluded
-   so scrolling to the top reaches 0 instead of snapping below it. */
-.main-container > *:not(:first-child) {
-  scroll-snap-align: start;
-}
-
 .card {
   padding: 2em;
 }

@@ -69,7 +69,6 @@ body {
   overflow-x: hidden;
   scroll-behavior: smooth;
   scroll-padding-top: 6rem;
-  scroll-snap-type: y proximity;
 }
 
 #app {
