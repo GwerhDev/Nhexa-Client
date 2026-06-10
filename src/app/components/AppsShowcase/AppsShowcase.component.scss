@@ -39,7 +39,9 @@
 
 .app-row {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  // minmax(0, 1fr) prevents the Swiper's intrinsic content (a row of slides
+  // plus loop duplicates) from blowing out the track and overflowing the page.
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 3rem;
   align-items: center;
 
@@ -51,6 +53,7 @@
 
 .app-media {
   width: 100%;
+  min-width: 0;
 }
 
 .app-swiper {
@@ -160,7 +163,7 @@
   }
 
   .app-row {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 1.5rem;
 
     &.reversed {

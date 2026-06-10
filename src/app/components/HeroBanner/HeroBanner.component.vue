@@ -1,35 +1,87 @@
 <template>
   <div class="hero-banner" id="home">
-    <div class="hero-content">
-      <section class="section-left">
-        <span class="color-white">
-          <h1 class="color-white bold">CONECTA TUS <b class="featured">SENTIDOS</b></h1>
-        </span>
-        <p>
-          <b>NHEXA Interface</b> es un espacio de <b>colaboración interdisciplinar</b> para el desarrollo autónomo de proyectos de
-          <b>medios interactivos</b>, en retroalimentación abierta con las <b>comunidades</b> a las que estos estén dirigidos.</p>
-        <button>Saber más...</button>
-      </section>
-      <section class="section-right" ref="container">
-        <SpinnerLoaderComponent v-if="loading" />
-      </section>
-    </div>
+    <swiper
+      :modules="modules"
+      :slides-per-view="1"
+      :space-between="0"
+      :rewind="true"
+      :autoplay="{ delay: 6000, disableOnInteraction: false }"
+      :pagination="{ clickable: true }"
+      :navigation="true"
+      class="hero-swiper"
+    >
+      <!-- First slide: text + action on the left, 3D element on the right -->
+      <swiper-slide>
+        <div class="hero-content">
+          <section class="section-left">
+            <span class="color-white">
+              <h1 class="color-white bold">CONECTA TUS <b class="featured">SENTIDOS</b></h1>
+            </span>
+            <p>
+              <b>NHEXA Interface</b> es un espacio de <b>colaboración interdisciplinar</b> para el desarrollo autónomo de proyectos de
+              <b>medios interactivos</b>, en retroalimentación abierta con las <b>comunidades</b> a las que estos estén dirigidos.
+            </p>
+            <a class="hero-cta" href="/#manifiesto">Saber más...</a>
+          </section>
+          <section class="section-right" ref="container">
+            <SpinnerLoaderComponent v-if="loading" />
+          </section>
+        </div>
+      </swiper-slide>
+
+      <!-- Remaining slides: text + action on the left, placeholder image on the right -->
+      <swiper-slide v-for="(slide, i) in imageSlides" :key="i">
+        <div class="hero-content">
+          <section class="section-left">
+            <span class="color-white">
+              <h1 class="color-white bold">{{ slide.title }}</h1>
+            </span>
+            <p>{{ slide.text }}</p>
+            <a class="hero-cta" :href="slide.ctaHref" target="_blank" rel="noopener">{{ slide.ctaLabel }}</a>
+          </section>
+          <section class="section-right">
+            <div class="hero-media">
+              <img :src="slide.image" :alt="slide.title" loading="lazy" />
+              <span class="placeholder-badge">placeholder · streamby</span>
+            </div>
+          </section>
+        </div>
+      </swiper-slide>
+    </swiper>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, markRaw } from 'vue';
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { Swiper, SwiperSlide } from 'swiper/vue';
+import { Navigation, Pagination, Autoplay } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
 import SpinnerLoaderComponent from '../Loaders/SpinnerLoader.component.vue';
+import { APPS } from '../../../middlewares/misc/apps.data';
 
 const logoUrl = "https://streamby.s3.sa-east-1.amazonaws.com/68e0e3e992756fbbd2478f2e/3d-models/db9b755a-b5a1-462d-95d9-1a2bd6004511.glb";
 
 export default defineComponent({
   name: 'HeroBannerComponent',
-  components: { SpinnerLoaderComponent },
+  components: { Swiper, SwiperSlide, SpinnerLoaderComponent },
   data() {
-    return { loading: true };
+    return {
+      loading: true,
+      modules: markRaw([Navigation, Pagination, Autoplay]),
+      // Image slides derived from the ecosystem apps (placeholder media for now).
+      // TODO(streamby): replace images with media served by the API.
+      imageSlides: APPS.map((app) => ({
+        title: app.name,
+        text: app.tagline,
+        ctaLabel: `Explorar ${app.name}`,
+        ctaHref: app.url,
+        image: app.gallery[0].src,
+      })),
+    };
   },
   mounted() {
     let scene: THREE.Scene,

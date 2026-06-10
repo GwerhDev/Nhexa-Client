@@ -3,7 +3,10 @@
     <div class="inner-container">
       <div class="footer-top">
         <div class="footer-brand">
-          <h3>NHEXA<span>Interface</span></h3>
+          <div class="footer-logo">
+            <Logo width="40" />
+            <span class="footer-logo-suffix">Interface</span>
+          </div>
           <p>Colaboración interdisciplinar para medios interactivos.</p>
         </div>
 
@@ -41,9 +44,11 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { APPS } from '../../../middlewares/misc/apps.data';
+import Logo from '../Logo/Logo.component.vue';
 
 export default defineComponent({
   name: 'FooterComponent',
+  components: { Logo },
   data() {
     return { APPS, year: new Date().getFullYear() };
   },

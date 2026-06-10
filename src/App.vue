@@ -15,14 +15,10 @@ onMounted(() => {
 
 <template>
   <nav-bar />
-  <div class="main-layout">
-    <div class="app-container">
-      <div class="router-view">
-        <router-view />
-      </div>
-    </div>
-    <footer-component />
-  </div>
+  <main class="main-container">
+    <router-view />
+  </main>
+  <footer-component />
 </template>
 
 <style>
