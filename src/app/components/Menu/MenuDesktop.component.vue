@@ -2,10 +2,16 @@
 <script setup lang="ts">
 import { computed, Ref } from 'vue';
 import { useStore } from '../../../middlewares/store';
+import { scrollToTop } from '../../../helpers/menu';
 import SkeletonLoader from '../Loaders/SkeletonLoader.component.vue';
 
 const store = useStore();
 const menuList: Ref<any[]> = computed(() => store.menuList);
+
+// A menu item is active when its section anchor matches the section currently
+// in view (scroll-spy). e.g. item.section "/#apps" matches activeSection "apps".
+const isActive = (section?: string): boolean =>
+  !!section && !!store.activeSection && section.endsWith('#' + store.activeSection);
 
 </script>
 
@@ -13,11 +19,11 @@ const menuList: Ref<any[]> = computed(() => store.menuList);
   <div class="container-menu-desk">
     <div class="inner-container">
       <ul class="ul-menu-desktop" v-if="menuList.length">
-        <router-link class="label-menu-link pl-2 pr-2" id="first" to="/#home">
+        <router-link class="label-menu-link pl-2 pr-2" id="first" to="/" @click="scrollToTop()" :class="{ 'is-active': !store.activeSection }">
           <font-awesome-icon :icon="['fas', 'house']" />
         </router-link>
         <li v-for="(item, index) in menuList" :key="index">
-          <div class="label-menu-link">
+          <div class="label-menu-link" :class="{ 'is-active': isActive(item.route || item.section) }">
             <router-link v-if="item.route || item.section" :to="item.route || item.section">
               <p class="pl-2 pr-2 d-flex align-cent gap-1 color-white font-bold">
                 {{ item.label }}

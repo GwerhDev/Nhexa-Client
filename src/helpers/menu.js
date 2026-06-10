@@ -13,3 +13,8 @@ export function closeMenu() {
   $d(".close-menu-container").style.display="none";
   $d(".burger-menu-container").style.display="flex";
 }
+
+// The scroll container is <body> (html has overflow:hidden).
+export function scrollToTop() {
+  document.body.scrollTo({ top: 0, behavior: "smooth" });
+}

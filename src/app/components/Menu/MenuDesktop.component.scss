@@ -5,7 +5,7 @@
 
   .inner-container {
     padding: .5rem;
-    padding-inline: 0;
+    padding-inline: .5rem;
     width: 100%;
     display: flex;
     justify-content: center;
@@ -87,7 +87,8 @@
     }
   }
 
-  &.router-link-exact-active {
+  &.router-link-exact-active,
+  &.is-active {
     background-color: var(--menu-hover-color);
   }
 }

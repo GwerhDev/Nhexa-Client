@@ -1,8 +1,27 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap');
+
+@font-face {
+  font-family: Game-Of-Squids;
+  src: url('../assets/fonts/Game-Of-Squids.ttf');
+}
+
+@font-face {
+  font-family: Obitron;
+  src: url('../assets/fonts/Orbitron.ttf');
+}
+
+@font-face {
+  font-family: Stencilum-Regular;
+  src: url('../assets/fonts/Stencilum-Regular.ttf');
+}
+
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
   display: flex;
+  align-items: center;
   flex-direction: column;
 
   margin: 0;
@@ -44,13 +63,109 @@ body {
   min-height: 100vh;
   color: var(--nhexa-white);
   display: flex;
+  align-items: center;
+  flex-direction: column;
+  overflow-y: auto;
   overflow-x: hidden;
+  scroll-behavior: smooth;
+  scroll-padding-top: 6rem;
+  scroll-snap-type: y proximity;
 }
 
 #app {
   margin: 0;
   padding: 0;
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+h1 {
+  margin: 0;
+  padding: 0;
+  font-size: 3em;
+  line-height: 1.1;
+  color: var(--primary-color);
+}
+
+a {
+  font-weight: 500;
+  color: var(--primary-color);
+  text-decoration: inherit;
+}
+
+a:hover {
+  color: var(--primary-hover-color);
+}
+
+header {
   width: 100%;
   display: flex;
   flex-direction: column;
+}
+
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background: var(--primary-color);
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+
+button:hover {
+  border-color: var(--primary-color);
+  background: var(--primary-hover-color);
+}
+
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+button:disabled,
+button:disabled:hover {
+  cursor: default;
+  border-color: var(--primary-color);
+  background: #5f5f5f;
+}
+
+ul {
+  margin: 0;
+  padding: 0;
+  text-decoration: none;
+  list-style: none;
+}
+
+input[type="text"] {
+  border: 1px solid var(--primary-color);
+  border-radius: 5px;
+  background: var(--components-background);
+}
+
+input:disabled {
+  border: none;
+  border-color: transparent;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 100%;
+}
+
+::-webkit-scrollbar-track {
+  background: linear-gradient(168deg, #e4e0e0 20%, var(--button-secondary-color) 120%);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(168deg, #414141 20%, var(--button-primary-color) 120%);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(168deg, #414141 20%, var(--button-primary-hover-color) 120%);
 }
