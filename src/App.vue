@@ -5,31 +5,51 @@ import { onMounted, onUnmounted } from 'vue';
 import { useStore } from './middlewares/store';
 const store: any = useStore();
 
-let observer: IntersectionObserver | null = null;
+let cleanupSpy: (() => void) | null = null;
 
-// Scroll-spy: mark the nav link active when its section crosses the viewport
-// center. No id-section in the center band (i.e. the hero/top) -> '' (home).
+// Scroll-spy by position: the active section is the LAST one whose top has
+// scrolled under the nav line. Above the first section (hero, no id) -> '' (home).
+// At the bottom of the page the last section is forced active (it may never
+// reach the line). The scroll container is <body> (html has overflow:hidden).
 const setupScrollSpy = () => {
   const sections = Array.from(
     document.querySelectorAll<HTMLElement>('.main-container > *[id]')
   );
   if (!sections.length) return;
 
-  const visible = new Set<string>();
-  observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((e) => {
-        if (e.isIntersecting) visible.add(e.target.id);
-        else visible.delete(e.target.id);
-      });
-      const firstVisible = sections.find((s) => visible.has(s.id));
-      store.setActiveSection(firstVisible ? firstVisible.id : '');
-    },
-    // Thin detection band just below the nav: the section crossing it is active.
-    // While the hero (no id) occupies the top, no id-section is in the band -> '' (home).
-    { rootMargin: '-8% 0px -90% 0px', threshold: 0 }
-  );
-  sections.forEach((s) => observer!.observe(s));
+  const OFFSET = 110; // px under the top: a section turns active when its top reaches here
+  const scroller = document.body;
+
+  const update = () => {
+    let current = '';
+    for (const s of sections) {
+      if (s.getBoundingClientRect().top <= OFFSET) current = s.id;
+      else break;
+    }
+    // Bottom of page: force the last section active.
+    if (scroller.scrollTop + scroller.clientHeight >= scroller.scrollHeight - 2) {
+      current = sections[sections.length - 1].id;
+    }
+    if (store.activeSection !== current) store.setActiveSection(current);
+  };
+
+  let ticking = false;
+  const onScroll = () => {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => { update(); ticking = false; });
+  };
+
+  scroller.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll);
+  update();
+
+  cleanupSpy = () => {
+    scroller.removeEventListener('scroll', onScroll);
+    window.removeEventListener('scroll', onScroll);
+    window.removeEventListener('resize', onScroll);
+  };
 };
 
 onMounted(() => {
@@ -39,7 +59,7 @@ onMounted(() => {
   requestAnimationFrame(setupScrollSpy);
 });
 
-onUnmounted(() => observer?.disconnect());
+onUnmounted(() => cleanupSpy?.());
 
 </script>
 
