@@ -20,7 +20,7 @@ const pillars = [
 </script>
 
 <template>
-  <section class="manifesto" id="manifiesto">
+  <section class="manifesto" id="manifesto">
     <div class="inner-container">
       <header class="manifesto-header">
         <span class="eyebrow">Manifiesto</span>

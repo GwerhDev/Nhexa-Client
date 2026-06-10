@@ -7,6 +7,7 @@ interface storeState {
   appList: { user: Array<any>, admin?: Array<any> },
   menuList: Array<any>,
   isLoading: boolean,
+  activeSection: string,
 }
 
 export const useStore = defineStore('store', {
@@ -15,9 +16,14 @@ export const useStore = defineStore('store', {
     appList: { user: [], admin: [] },
     menuList: [],
     isLoading: false,
+    activeSection: '',
   }),
 
   actions: {
+    setActiveSection(id: string) {
+      this.activeSection = id;
+    },
+
     logout() {
       clearUserToken();
       this.currentUser = {};

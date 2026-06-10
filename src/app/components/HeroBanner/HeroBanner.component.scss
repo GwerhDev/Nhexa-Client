@@ -20,11 +20,43 @@
 .hero-content {
   width: 100%;
   height: 100%;
-  padding: 2rem 4rem;
+  padding: 2rem 2rem;
   display: flex;
   align-items: center;
   text-align: center;
   box-sizing: border-box;
+}
+
+// Image slides: placeholder background behind the content, with a dark
+// overlay so the text stays readable.
+.hero-content--bg {
+  position: relative;
+  isolation: isolate;
+  background-size: cover;
+  background-position: center;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(90deg, rgba(10, 14, 18, 0.92) 0%, rgba(10, 14, 18, 0.7) 50%, rgba(10, 14, 18, 0.55) 100%);
+  }
+}
+
+.bg-placeholder-badge {
+  position: absolute;
+  bottom: 0.75rem;
+  left: 0.75rem;
+  z-index: 1;
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  color: var(--nhexa-white);
+  background: rgba(10, 14, 18, 0.6);
+  border: solid 1px var(--primary-color);
 }
 
 .section-left {
@@ -127,13 +159,18 @@
 }
 
 @media (max-width: 1080px) {
+  .hero-banner {
+    // The nav is fixed on mobile, so push the slider down to clear it.
+    padding-top: 4.5rem;
+  }
+
   .hero-swiper {
     height: clamp(620px, 92vh, 820px);
   }
 
   .hero-content {
     flex-direction: column;
-    padding: 1.5rem 1rem;
+    padding: 1.5rem 1.25rem;
     gap: 1.5rem;
 
     .section-left,

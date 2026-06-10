@@ -4,7 +4,7 @@ import { DOWNLOAD_URL } from '../../../middlewares/misc/const';
 </script>
 
 <template>
-  <section class="cta" id="descarga">
+  <section class="cta" id="download">
     <div class="cta-card">
       <div class="cta-text">
         <h2>Lleva NHEXA contigo</h2>

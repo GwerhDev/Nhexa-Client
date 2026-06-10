@@ -1,13 +1,15 @@
 <template>
-  <div class="hero-banner" id="home">
+  <div class="hero-banner">
     <swiper
       :modules="modules"
       :slides-per-view="1"
       :space-between="0"
       :rewind="true"
-      :autoplay="{ delay: 6000, disableOnInteraction: false }"
+      :speed="1200"
+      :autoplay="{ delay: 9000, disableOnInteraction: false }"
       :pagination="{ clickable: true }"
       :navigation="true"
+      @swiper="onSwiper"
       class="hero-swiper"
     >
       <!-- First slide: text + action on the left, 3D element on the right -->
@@ -21,9 +23,10 @@
               <b>NHEXA Interface</b> es un espacio de <b>colaboración interdisciplinar</b> para el desarrollo autónomo de proyectos de
               <b>medios interactivos</b>, en retroalimentación abierta con las <b>comunidades</b> a las que estos estén dirigidos.
             </p>
-            <a class="hero-cta" href="/#manifiesto">Saber más...</a>
+            <a class="hero-cta" href="/#manifesto">Saber más...</a>
           </section>
-          <section class="section-right" ref="container">
+          <!-- swiper-no-swiping: lets the drag rotate the 3D model instead of swiping the slide -->
+          <section class="section-right swiper-no-swiping" ref="container">
             <SpinnerLoaderComponent v-if="loading" />
           </section>
         </div>
@@ -31,7 +34,8 @@
 
       <!-- Remaining slides: text + action on the left, placeholder image on the right -->
       <swiper-slide v-for="(slide, i) in imageSlides" :key="i">
-        <div class="hero-content">
+        <div class="hero-content hero-content--bg" :style="{ backgroundImage: `url(${slide.background})` }">
+          <span class="bg-placeholder-badge">placeholder · streamby</span>
           <section class="section-left">
             <span class="color-white">
               <h1 class="color-white bold">{{ slide.title }}</h1>
@@ -80,8 +84,18 @@ export default defineComponent({
         ctaLabel: `Explorar ${app.name}`,
         ctaHref: app.url,
         image: app.gallery[0].src,
+        // Slide background placeholder.
+        // TODO(streamby): replace with background media served by the API.
+        background: `https://picsum.photos/seed/${app.id}-hero-bg/1600/900`,
       })),
+      // Swiper instance, kept non-reactive (assigned via the @swiper event).
+      swiperInstance: null as any,
     };
+  },
+  methods: {
+    onSwiper(swiper: any) {
+      this.swiperInstance = swiper;
+    },
   },
   mounted() {
     let scene: THREE.Scene,
@@ -247,6 +261,8 @@ export default defineComponent({
       prevMouseX = event.clientX;
       prevMouseY = event.clientY;
       container.style.cursor = 'grabbing';
+      // Pause the slider while the user interacts with the 3D model.
+      this.swiperInstance?.autoplay?.stop();
     };
 
     const onMouseMove = (event: MouseEvent) => {
@@ -272,12 +288,15 @@ export default defineComponent({
     const onMouseUp = () => {
       isDragging = false;
       container.style.cursor = 'grab';
+      // Resume the slider once the interaction ends.
+      this.swiperInstance?.autoplay?.start();
     };
 
     const onMouseLeave = () => {
       isDragging = false;
       container.style.cursor = 'grab';
       mouseLight.position.set(0, 0, 3);
+      this.swiperInstance?.autoplay?.start();
     };
 
     container.style.cursor = 'grab';

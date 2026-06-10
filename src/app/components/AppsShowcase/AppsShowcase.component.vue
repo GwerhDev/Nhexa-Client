@@ -11,10 +11,10 @@ const modules = [Navigation, Pagination];
 </script>
 
 <template>
-  <section class="apps-showcase" id="aplicaciones">
+  <section class="apps-showcase" id="apps">
     <div class="inner-container">
       <header class="section-header">
-        <h2>Nuestras <b class="featured">aplicaciones</b></h2>
+        <h2>Nuestras aplicaciones</h2>
         <p>Un ecosistema de herramientas para crear, publicar y distribuir medios interactivos.</p>
       </header>
 
