@@ -52,7 +52,6 @@ const projects = [
           <div class="project-media">
             <img :src="project.image" :alt="project.name" loading="lazy" />
             <span class="status-badge" :class="`status-badge--${project.statusKind}`">{{ project.status }}</span>
-            <span class="placeholder-badge">placeholder · streamby</span>
           </div>
           <div class="project-body">
             <h3>{{ project.name }}</h3>

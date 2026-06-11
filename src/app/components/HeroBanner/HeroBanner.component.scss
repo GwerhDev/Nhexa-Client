@@ -32,9 +32,9 @@
 .hero-content--bg {
   position: relative;
   isolation: isolate;
-  background-size: cover;
-  background-position: center;
+  overflow: hidden;
 
+  // Dark overlay over the screenshot so the text stays readable.
   &::before {
     content: '';
     position: absolute;
@@ -44,19 +44,18 @@
   }
 }
 
-.bg-placeholder-badge {
+// Background screenshot with a stylized 3D / skewed treatment.
+.hero-bg {
   position: absolute;
-  bottom: 0.75rem;
-  left: 0.75rem;
-  z-index: 1;
-  font-size: 0.65rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  padding: 0.2rem 0.55rem;
-  border-radius: 999px;
-  color: var(--nhexa-white);
-  background: rgba(10, 14, 18, 0.6);
-  border: solid 1px var(--primary-color);
+  inset: 0;
+  z-index: -2;
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
 }
 
 .section-left {
@@ -71,6 +70,28 @@
   p {
     max-width: 600px;
     margin: 0;
+  }
+}
+
+// App logo shown over the title on the slides (Spectra / Spellcast).
+.hero-logo {
+  width: 84px;
+  height: 84px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 18px;
+  background: rgba(10, 14, 18, 0.45);
+  border: solid 1px rgba(229, 229, 229, 0.5);
+  backdrop-filter: blur(4px);
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: 0.5rem;
+    box-sizing: border-box;
   }
 }
 
@@ -101,19 +122,6 @@
   }
 }
 
-.placeholder-badge {
-  position: absolute;
-  top: 0.75rem;
-  left: 0.75rem;
-  font-size: 0.65rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  padding: 0.2rem 0.55rem;
-  border-radius: 999px;
-  color: var(--nhexa-white);
-  background: rgba(10, 14, 18, 0.6);
-  border: solid 1px var(--primary-color);
-}
 
 .hero-cta {
   display: inline-block;

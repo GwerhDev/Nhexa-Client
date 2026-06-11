@@ -13,8 +13,8 @@ import Support from '../components/Support/Support.component.vue';
     <hero-banner-component />
     <projects />
     <departments />
-    <apps-showcase />
     <products />
+    <apps-showcase />
     <manifesto />
     <call-to-action />
     <support />

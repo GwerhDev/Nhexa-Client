@@ -32,22 +32,21 @@
         </div>
       </swiper-slide>
 
-      <!-- Remaining slides: text + action on the left, placeholder image on the right -->
+      <!-- App slides (Spectra, Spellcast): logo over the title on the left, background image only -->
       <swiper-slide v-for="(slide, i) in imageSlides" :key="i">
-        <div class="hero-content hero-content--bg" :style="{ backgroundImage: `url(${slide.background})` }">
-          <span class="bg-placeholder-badge">placeholder · streamby</span>
+        <div class="hero-content hero-content--bg">
+          <div class="hero-bg" aria-hidden="true">
+            <img :src="slide.background" alt="" loading="lazy" />
+          </div>
           <section class="section-left">
+            <span class="hero-logo">
+              <img :src="slide.logo" :alt="slide.title" />
+            </span>
             <span class="color-white">
               <h1 class="color-white bold">{{ slide.title }}</h1>
             </span>
             <p>{{ slide.text }}</p>
             <a class="hero-cta" :href="slide.ctaHref" target="_blank" rel="noopener">{{ slide.ctaLabel }}</a>
-          </section>
-          <section class="section-right">
-            <div class="hero-media">
-              <img :src="slide.image" :alt="slide.title" loading="lazy" />
-              <span class="placeholder-badge">placeholder · streamby</span>
-            </div>
           </section>
         </div>
       </swiper-slide>
@@ -65,7 +64,7 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import SpinnerLoaderComponent from '../Loaders/SpinnerLoader.component.vue';
-import { APPS } from '../../../middlewares/misc/apps.data';
+import { HERO_APPS } from '../../../middlewares/misc/apps.data';
 
 const logoUrl = "https://streamby.s3.sa-east-1.amazonaws.com/68e0e3e992756fbbd2478f2e/3d-models/db9b755a-b5a1-462d-95d9-1a2bd6004511.glb";
 
@@ -76,17 +75,16 @@ export default defineComponent({
     return {
       loading: true,
       modules: markRaw([Navigation, Pagination, Autoplay]),
-      // Image slides derived from the ecosystem apps (placeholder media for now).
-      // TODO(streamby): replace images with media served by the API.
-      imageSlides: APPS.map((app) => ({
+      // Hero slides: only Spectra and Spellcast. Each shows the app logo over the
+      // title on the left, and a placeholder background image (no foreground media).
+      // TODO(streamby): replace background images with media served by the API.
+      imageSlides: HERO_APPS.map((app) => ({
         title: app.name,
         text: app.tagline,
         ctaLabel: `Explorar ${app.name}`,
         ctaHref: app.url,
-        image: app.gallery[0].src,
-        // Slide background placeholder.
-        // TODO(streamby): replace with background media served by the API.
-        background: `https://picsum.photos/seed/${app.id}-hero-bg/1600/900`,
+        logo: app.logo,
+        background: app.heroBg ?? app.gallery[0]?.src,
       })),
       // Swiper instance, kept non-reactive (assigned via the @swiper event).
       swiperInstance: null as any,

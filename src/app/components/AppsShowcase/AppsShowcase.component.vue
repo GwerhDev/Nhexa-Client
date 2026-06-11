@@ -40,7 +40,6 @@ const modules = [Navigation, Pagination];
             <swiper-slide v-for="(media, i) in app.gallery" :key="i">
               <div class="media-slide">
                 <img :src="media.src" :alt="media.alt" loading="lazy" />
-                <span class="placeholder-badge">placeholder · streamby</span>
               </div>
             </swiper-slide>
           </swiper>
@@ -49,7 +48,8 @@ const modules = [Navigation, Pagination];
         <!-- App info -->
         <div class="app-info">
           <span class="app-icon">
-            <font-awesome-icon :icon="app.icon" />
+            <img v-if="app.logo" :src="app.logo" :alt="app.name" />
+            <font-awesome-icon v-else :icon="app.icon" />
           </span>
           <h3>{{ app.name }}</h3>
           <p class="tagline">{{ app.tagline }}</p>
