@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import NavBar from './app/components/Navigator/NavBar.component.vue';
 import FooterComponent from './app/components/Footer/Footer.component.vue';
-import { onMounted, onUnmounted } from 'vue';
+import { onMounted, onUnmounted, watch } from 'vue';
+import { useRoute } from 'vue-router';
 import { useStore } from './middlewares/store';
 const store: any = useStore();
+const route = useRoute();
 
 let cleanupSpy: (() => void) | null = null;
 
@@ -51,6 +53,16 @@ const setupScrollSpy = () => {
     window.removeEventListener('resize', onScroll);
   };
 };
+
+watch(() => route.path, (path) => {
+  if (path === '/') {
+    requestAnimationFrame(setupScrollSpy);
+  } else {
+    cleanupSpy?.();
+    cleanupSpy = null;
+    store.setActiveSection('');
+  }
+});
 
 onMounted(() => {
   store.handleUserData();
