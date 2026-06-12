@@ -11,10 +11,10 @@ import Support from '../components/Support/Support.component.vue';
 
 <template>
     <hero-banner-component />
-    <projects />
     <departments />
     <products />
     <apps-showcase />
+    <projects />
     <manifesto />
     <call-to-action />
     <support />
