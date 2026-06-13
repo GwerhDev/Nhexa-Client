@@ -54,6 +54,9 @@
   --components-background-solid: #2d3337;
   --special-color: #33223a;
   --footer-background: #10141870;
+
+  --accent: #73a5cc;
+  --bg: #1a1a1c;
 }
 
 body {
