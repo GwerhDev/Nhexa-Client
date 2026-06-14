@@ -1,10 +1,13 @@
 import { defineStore } from 'pinia';
-import { getAppList, getMenuList, getUserData } from '../services';
+import { getNhexaEnv, getMenuList, getUserData } from '../services';
 import { clearUserToken } from '../services/token';
+
+export interface AppEntry { label: string; url: string; icon: string; color?: string; description?: string; route?: string }
+export interface EnvCategory { id: string; name: string; apps: AppEntry[] }
 
 interface storeState {
   currentUser: any,
-  appList: { user: Array<any>, admin?: Array<any> },
+  appList: EnvCategory[],
   menuList: Array<any>,
   isLoading: boolean,
   activeSection: string,
@@ -13,7 +16,7 @@ interface storeState {
 export const useStore = defineStore('store', {
   state: (): storeState => ({
     currentUser: {},
-    appList: { user: [], admin: [] },
+    appList: [],
     menuList: [],
     isLoading: false,
     activeSection: '',
@@ -42,8 +45,8 @@ export const useStore = defineStore('store', {
       }
     },
 
-    async handleGetAppList() {
-      this.appList = await getAppList();
+    async handleGetNhexaEnv() {
+      this.appList = await getNhexaEnv();
       return;
     },
 

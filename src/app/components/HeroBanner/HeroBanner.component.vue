@@ -66,7 +66,7 @@ import 'swiper/css/pagination';
 import SpinnerLoaderComponent from '../Loaders/SpinnerLoader.component.vue';
 import { HERO_APPS } from '../../../middlewares/misc/apps.data';
 
-const logoUrl = "https://streamby.s3.sa-east-1.amazonaws.com/68e0e3e992756fbbd2478f2e/3d-models/db9b755a-b5a1-462d-95d9-1a2bd6004511.glb";
+const logoUrl = "https://streamby.s3.sa-east-1.amazonaws.com/be4dce92-de7c-4820-8f93-b3ea3335575d/3d-models/74fad9f9-ff8f-4ac1-ada3-3476b8dc82cd.glb";
 
 export default defineComponent({
   name: 'HeroBannerComponent',

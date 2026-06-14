@@ -66,7 +66,7 @@ watch(() => route.path, (path) => {
 
 onMounted(() => {
   store.handleUserData();
-  store.handleGetAppList();
+  store.handleGetNhexaEnv();
   store.handleGetMenuList();
   requestAnimationFrame(setupScrollSpy);
 });
