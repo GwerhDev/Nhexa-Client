@@ -35,7 +35,7 @@
       </div>
 
       <div class="footer-bottom">
-        <small>© {{ year }} NHEXA Interface · Todos los derechos reservados.</small>
+        <small>⬡ {{ year }} NHEXA Interface · Proyecto de colaboración abierta.</small>
       </div>
     </div>
   </footer>
