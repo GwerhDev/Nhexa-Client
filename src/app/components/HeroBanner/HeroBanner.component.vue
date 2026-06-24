@@ -309,6 +309,19 @@ export default defineComponent({
       camera.updateProjectionMatrix();
       renderer.setSize(container.clientWidth, container.clientHeight);
     });
+
+    // Pause autoplay when the banner scrolls out of view
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          this.swiperInstance?.autoplay?.start();
+        } else {
+          this.swiperInstance?.autoplay?.stop();
+        }
+      },
+      { threshold: 0.1 }
+    );
+    observer.observe(this.$el);
   },
 });
 </script>
