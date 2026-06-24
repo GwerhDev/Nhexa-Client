@@ -12,6 +12,36 @@
   --swiper-theme-color: var(--primary-color);
   --swiper-navigation-size: 28px;
 
+  :deep(.swiper-button-prev),
+  :deep(.swiper-button-next) {
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  &:hover {
+    :deep(.swiper-button-prev),
+    :deep(.swiper-button-next) {
+      opacity: 1;
+    }
+  }
+
+  @media (max-width: 1080px) {
+    :deep(.swiper-button-prev),
+    :deep(.swiper-button-next) {
+      display: none;
+    }
+  }
+
+  :deep(.swiper-pagination-bullet) {
+    background: var(--nhexa-white);
+    opacity: 0.5;
+  }
+
+  :deep(.swiper-pagination-bullet-active) {
+    background: var(--primary-color);
+    opacity: 1;
+  }
+
   :deep(.swiper-slide) {
     height: 100%;
   }
@@ -187,10 +217,16 @@
 
     .section-left {
       width: 100%;
+      height: 100%;
     }
 
     .section-right {
-      display: none;
+      width: 100%;
+      height: 50%;
+    }
+
+    &:has(.section-right) .section-left {
+      height: 50%;
     }
   }
 }
