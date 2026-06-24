@@ -1,17 +1,21 @@
 <style scoped lang="scss" src="./AppsShowcase.component.scss" />
 <script setup lang="ts">
+import { ref } from 'vue';
 import { Swiper, SwiperSlide } from 'swiper/vue';
 import { Navigation, Pagination } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import { APPS } from '../../../middlewares/misc/apps.data';
+import { useReveal } from '../../../utils/useReveal';
 
 const modules = [Navigation, Pagination];
+const el = ref<HTMLElement | null>(null);
+useReveal(el);
 </script>
 
 <template>
-  <section class="apps-showcase" id="apps">
+  <section ref="el" class="apps-showcase reveal" id="apps">
     <div class="inner-container">
       <header class="section-header">
         <h2>Nuestras aplicaciones</h2>

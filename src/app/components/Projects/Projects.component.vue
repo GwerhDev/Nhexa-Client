@@ -1,5 +1,11 @@
 <style scoped lang="scss" src="./Projects.component.scss" />
 <script setup lang="ts">
+import { ref } from 'vue';
+import { useReveal } from '../../../utils/useReveal';
+
+const el = ref<HTMLElement | null>(null);
+useReveal(el);
+
 // Hard-coded projects (placeholder media/copy for now).
 // TODO(streamby): replace with project data served by the API.
 const projects = [
@@ -34,7 +40,7 @@ const projects = [
 </script>
 
 <template>
-  <section class="projects" id="projects">
+  <section ref="el" class="projects reveal" id="projects">
     <div class="inner-container">
       <header class="section-header">
         <h2>Nuestros proyectos</h2>

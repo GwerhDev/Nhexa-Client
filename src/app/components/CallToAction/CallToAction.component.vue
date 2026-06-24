@@ -1,10 +1,15 @@
 <style scoped lang="scss" src="./CallToAction.component.scss" />
 <script setup lang="ts">
+import { ref } from 'vue';
 import { DOWNLOAD_URL } from '../../../middlewares/misc/const';
+import { useReveal } from '../../../utils/useReveal';
+
+const el = ref<HTMLElement | null>(null);
+useReveal(el);
 </script>
 
 <template>
-  <section class="cta" id="download">
+  <section ref="el" class="cta reveal" id="download">
     <div class="cta-card">
       <div class="cta-text">
         <h2>Lleva NHEXA contigo</h2>

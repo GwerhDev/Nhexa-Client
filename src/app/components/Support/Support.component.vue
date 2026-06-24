@@ -1,9 +1,14 @@
 <style scoped lang="scss" src="./Support.component.scss" />
 <script setup lang="ts">
+import { ref } from 'vue';
+import { useReveal } from '../../../utils/useReveal';
+
+const el = ref<HTMLElement | null>(null);
+useReveal(el);
 </script>
 
 <template>
-  <section class="support" id="support">
+  <section ref="el" class="support reveal" id="support">
     <div class="support-card">
       <span class="support-icon">
         <font-awesome-icon :icon="['fas', 'headset']" />

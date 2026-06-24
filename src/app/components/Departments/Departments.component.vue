@@ -1,5 +1,11 @@
 <style scoped lang="scss" src="./Departments.component.scss" />
 <script setup lang="ts">
+import { ref } from 'vue';
+import { useReveal } from '../../../utils/useReveal';
+
+const el = ref<HTMLElement | null>(null);
+useReveal(el);
+
 // Hard-coded departments (placeholder copy for now).
 const departments = [
   {
@@ -20,7 +26,7 @@ const departments = [
 </script>
 
 <template>
-  <section class="departments" id="departments">
+  <section ref="el" class="departments reveal" id="departments">
     <div class="inner-container">
       <header class="section-header">
         <h2>Nuestros departamentos</h2>

@@ -1,5 +1,11 @@
 <style scoped lang="scss" src="./Manifesto.component.scss" />
 <script setup lang="ts">
+import { ref } from 'vue';
+import { useReveal } from '../../../utils/useReveal';
+
+const el = ref<HTMLElement | null>(null);
+useReveal(el);
+
 const pillars = [
   {
     icon: ['fas', 'people-group'] as [string, string],
@@ -20,7 +26,7 @@ const pillars = [
 </script>
 
 <template>
-  <section class="manifesto" id="manifesto">
+  <section ref="el" class="manifesto reveal" id="manifesto">
     <div class="inner-container">
       <header class="manifesto-header">
         <span class="eyebrow">Manifiesto</span>

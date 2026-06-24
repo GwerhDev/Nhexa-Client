@@ -1,17 +1,21 @@
 <style scoped lang="scss" src="./Products.component.scss" />
 <script setup lang="ts">
+import { ref } from 'vue';
 import { Swiper, SwiperSlide } from 'swiper/vue';
 import { Navigation, Pagination } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import { PRODUCTS } from '../../../middlewares/misc/apps.data';
+import { useReveal } from '../../../utils/useReveal';
 
 const modules = [Navigation, Pagination];
+const el = ref<HTMLElement | null>(null);
+useReveal(el);
 </script>
 
 <template>
-  <section class="products" id="products">
+  <section ref="el" class="products reveal" id="products">
     <div class="inner-container">
       <header class="section-header">
         <h2>Nuestros productos</h2>
