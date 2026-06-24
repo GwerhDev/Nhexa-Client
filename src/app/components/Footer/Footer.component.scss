@@ -97,6 +97,20 @@
 
   .footer-top {
     flex-direction: column;
+    align-items: center;
     gap: 2rem;
+    text-align: center;
+  }
+
+  .footer-brand {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .footer-links {
+    flex-wrap: nowrap;
+    gap: 2rem;
+    justify-content: center;
   }
 }
