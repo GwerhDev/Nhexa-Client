@@ -100,7 +100,7 @@ function search() {
           <div class="submenu-mobile-container">
             <ul v-if="item?.submenu" class="submenu-mobile">
               <li v-for="(subItem, subIndex) in item.submenu" :key="subIndex">
-                <a v-if="subItem.href" class="mobile-submenu-link" :href="subItem.href">
+                <a v-if="subItem.href" @click="closeMenu()" class="mobile-submenu-link" :href="subItem.href">
                   <span>
                     <img :src="subItem?.icon" alt="" height="60">
                   </span>
@@ -116,7 +116,7 @@ function search() {
                   </ul>
                 </a>
 
-                <router-link v-if="subItem.route" class="mobile-submenu-link" :to="subItem.route">
+                <router-link  @click="closeMenu()" v-if="subItem.route" class="mobile-submenu-link" :to="subItem.route">
                   <span>
                     <img :src="subItem.icon" alt="" height="60">
                   </span>
