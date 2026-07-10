@@ -36,6 +36,7 @@
       <!-- App slides (Spectra, Spellcast): logo over the title on the left, background image only -->
       <swiper-slide v-for="(slide, i) in imageSlides" :key="i">
         <div class="hero-content hero-content--bg">
+          <canvas class="glow-canvas" aria-hidden="true"></canvas>
           <div class="hero-bg" aria-hidden="true">
             <img :src="slide.background" alt="" loading="lazy" />
           </div>
@@ -326,17 +327,15 @@ export default defineComponent({
     observer.observe(this.$el);
 
     // ── GPU fluid-simulation trail (WebGL-Fluid-Simulation) ───────────────────
-    // This is the same simulation the reference site (hi3d.ai) uses — a
-    // Navier-Stokes solver where the cursor injects dye + velocity. Config
-    // values mirror the reference.
-    const glowCanvas = this.$refs.glowCanvas as HTMLCanvasElement;
-    const slideHero = this.$refs.slideHero as HTMLElement;
-
-    WebGLFluid(glowCanvas, {
+    // Same Navier-Stokes solver the reference (hi3d.ai) uses. One instance per
+    // slide (each slide has its own .glow-canvas). The canvas is
+    // pointer-events:none so it never blocks the 3D model or the CTA; cursor
+    // movement over each slide is forwarded as synthetic events on its canvas.
+    const fluidConfig = {
       IMMEDIATE: true,
       TRIGGER: 'hover',
       SIM_RESOLUTION: 128,
-      DYE_RESOLUTION: 1024,
+      DYE_RESOLUTION: 512,          // lower — several instances run at once
       DENSITY_DISSIPATION: 3.5,
       VELOCITY_DISSIPATION: 2,
       PRESSURE: 0.1,
@@ -346,23 +345,23 @@ export default defineComponent({
       SPLAT_FORCE: 6000,
       SHADING: true,
       COLORFUL: false,                              // no rainbow cycling
-      SPLAT_COLOR: { r: 0.11, g: 0.11, b: 0.13 },   // white dye (faint cool tint)
+      SPLAT_COLOR: { r: 0.05, g: 0.05, b: 0.06 },   // faint white dye (subtle, won't wash out slides)
       TRANSPARENT: true,
       BLOOM: true,
-      BLOOM_INTENSITY: 0.35,                         // less glow
+      BLOOM_INTENSITY: 0.2,                          // minimal glow
       SUNRAYS: false,                                // drop the bright light rays
-    });
-
-    // The library binds its pointer listeners to the canvas, but the canvas is
-    // pointer-events:none (so it never blocks the 3D model or the CTA). Forward
-    // cursor movement over the whole slide as synthetic events on the canvas —
-    // dispatchEvent fires listeners regardless of pointer-events.
-    const forward = (type: string, e: MouseEvent) => {
-      glowCanvas.dispatchEvent(new MouseEvent(type, {
-        clientX: e.clientX, clientY: e.clientY, bubbles: false,
-      }));
     };
-    slideHero.addEventListener('mousemove', (e) => forward('mousemove', e));
+
+    const canvases = Array.from(this.$el.querySelectorAll('canvas.glow-canvas')) as HTMLCanvasElement[];
+    canvases.forEach((canvas) => {
+      WebGLFluid(canvas, fluidConfig);
+      const host = canvas.parentElement;              // the slide's .hero-content
+      host?.addEventListener('mousemove', (e: MouseEvent) => {
+        canvas.dispatchEvent(new MouseEvent('mousemove', {
+          clientX: e.clientX, clientY: e.clientY, bubbles: false,
+        }));
+      });
+    });
   },
 });
 </script>

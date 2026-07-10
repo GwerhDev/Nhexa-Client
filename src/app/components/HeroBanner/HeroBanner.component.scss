@@ -57,10 +57,11 @@
   box-sizing: border-box;
   position: relative;
   overflow: hidden;
+  // Same gradient pattern as before, but darkened to the app slides' tone.
   background:
-    radial-gradient(ellipse 80% 60% at 70% 40%, color-mix(in oklch, var(--accent) 12%, transparent), transparent 70%),
-    radial-gradient(ellipse 60% 40% at 20% 80%, color-mix(in oklch, var(--accent) 8%, transparent), transparent 70%),
-    linear-gradient(to right top, var(--bg), #18233c04);
+    radial-gradient(ellipse 80% 60% at 70% 40%, color-mix(in oklch, var(--accent) 10%, transparent), transparent 70%),
+    radial-gradient(ellipse 60% 40% at 20% 80%, color-mix(in oklch, var(--accent) 6%, transparent), transparent 70%),
+    linear-gradient(to right top, rgb(10, 14, 18), rgb(13, 18, 26));
 }
 
 // Canvas overlay for the smoke-trail cursor effect (first slide only)
