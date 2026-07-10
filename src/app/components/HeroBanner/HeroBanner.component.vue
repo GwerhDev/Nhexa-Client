@@ -339,9 +339,44 @@ export default defineComponent({
     // Each point stores its creation timestamp so it expires automatically —
     // the trail fades on its own when the mouse stops moving.
     interface TrailPoint { x: number; y: number; t: number; }
-    const TRAIL_MS = 700;   // how long (ms) each point stays visible
+    const TRAIL_MS = 850;   // how long (ms) each point stays visible
     const trail: TrailPoint[] = [];
     let insideHero = false;
+
+    // Draw a smooth ribbon through the trail using quadratic curves between the
+    // midpoints of consecutive points. width/alpha taper from head (thick,
+    // bright) to tail (thin, faint); combining age-fade with position-taper.
+    const strokeRibbon = (now: number, baseWidth: number, color: (a: number) => string, blur: number, blurColor: string) => {
+      ctx.save();
+      ctx.lineCap  = 'round';
+      ctx.lineJoin = 'round';
+      ctx.shadowBlur  = blur;
+      ctx.shadowColor = blurColor;
+      for (let i = 1; i < trail.length; i++) {
+        const p0 = trail[i - 1];
+        const p1 = trail[i];
+        const prev = trail[i - 2] ?? p0;
+        const next = trail[i + 1] ?? p1;
+        const fresh = 1 - (now - p1.t) / TRAIL_MS;         // age fade (0..1)
+        const taper = i / (trail.length - 1);              // position along trail (0 tail → 1 head)
+        const k = fresh * (0.25 + 0.75 * taper);           // combined strength
+        if (k <= 0) continue;
+
+        // Quadratic through midpoints keeps joins smooth even at speed.
+        const mid0x = (prev.x + p0.x) / 2, mid0y = (prev.y + p0.y) / 2;
+        const mid1x = (p0.x + p1.x) / 2,   mid1y = (p0.y + p1.y) / 2;
+        const mid2x = (p1.x + next.x) / 2, mid2y = (p1.y + next.y) / 2;
+
+        ctx.beginPath();
+        ctx.moveTo(mid0x, mid0y);
+        ctx.quadraticCurveTo(p0.x, p0.y, mid1x, mid1y);
+        ctx.quadraticCurveTo(p1.x, p1.y, mid2x, mid2y);
+        ctx.lineWidth   = Math.max(0.5, baseWidth * k);
+        ctx.strokeStyle = color(k);
+        ctx.stroke();
+      }
+      ctx.restore();
+    };
 
     const renderTrail = (now: number) => {
       ctx.clearRect(0, 0, glowCanvas.width, glowCanvas.height);
@@ -349,54 +384,31 @@ export default defineComponent({
       // Drop expired points from the tail
       while (trail.length > 0 && now - trail[0].t > TRAIL_MS) trail.shift();
 
-      if (trail.length > 1) {
-        ctx.lineCap  = 'round';
-        ctx.lineJoin = 'round';
-
+      if (trail.length > 2) {
         // Pass 1 — wide blurred glow layer
-        ctx.save();
-        ctx.shadowBlur  = 20;
-        ctx.shadowColor = 'rgba(120, 195, 255, 0.55)';
-        for (let i = 1; i < trail.length; i++) {
-          const fresh = 1 - (now - trail[i].t) / TRAIL_MS;
-          ctx.beginPath();
-          ctx.moveTo(trail[i - 1].x, trail[i - 1].y);
-          ctx.lineTo(trail[i].x,     trail[i].y);
-          ctx.lineWidth   = 1 + fresh * 7;
-          ctx.strokeStyle = `rgba(155, 215, 255, ${fresh * 0.3})`;
-          ctx.stroke();
-        }
-        ctx.restore();
-
-        // Pass 2 — thin bright core
-        ctx.save();
-        for (let i = 1; i < trail.length; i++) {
-          const fresh = 1 - (now - trail[i].t) / TRAIL_MS;
-          ctx.beginPath();
-          ctx.moveTo(trail[i - 1].x, trail[i - 1].y);
-          ctx.lineTo(trail[i].x,     trail[i].y);
-          ctx.lineWidth   = fresh * 2;
-          ctx.strokeStyle = `rgba(225, 248, 255, ${fresh * 0.85})`;
-          ctx.stroke();
-        }
-        ctx.restore();
+        strokeRibbon(now, 26, (a) => `rgba(150, 210, 255, ${a * 0.32})`, 34, 'rgba(110, 190, 255, 0.6)');
+        // Pass 2 — mid halo
+        strokeRibbon(now, 10, (a) => `rgba(185, 228, 255, ${a * 0.5})`, 14, 'rgba(150, 215, 255, 0.7)');
+        // Pass 3 — thin bright core
+        strokeRibbon(now, 3.5, (a) => `rgba(230, 250, 255, ${a * 0.95})`, 0, 'transparent');
       }
 
       // Bright orb at the cursor head
       if (insideHero && trail.length > 0) {
         const h = trail[trail.length - 1];
 
-        const halo = ctx.createRadialGradient(h.x, h.y, 0, h.x, h.y, 24);
-        halo.addColorStop(0, 'rgba(205, 242, 255, 0.52)');
+        const halo = ctx.createRadialGradient(h.x, h.y, 0, h.x, h.y, 40);
+        halo.addColorStop(0, 'rgba(205, 242, 255, 0.55)');
+        halo.addColorStop(0.4, 'rgba(140, 205, 255, 0.28)');
         halo.addColorStop(1, 'rgba(100, 180, 255, 0)');
         ctx.beginPath();
-        ctx.arc(h.x, h.y, 24, 0, Math.PI * 2);
+        ctx.arc(h.x, h.y, 40, 0, Math.PI * 2);
         ctx.fillStyle = halo;
         ctx.fill();
 
         ctx.beginPath();
-        ctx.arc(h.x, h.y, 2.5, 0, Math.PI * 2);
-        ctx.shadowBlur  = 28;
+        ctx.arc(h.x, h.y, 4, 0, Math.PI * 2);
+        ctx.shadowBlur  = 34;
         ctx.shadowColor = 'rgba(180, 235, 255, 1)';
         ctx.fillStyle   = 'rgba(242, 255, 255, 0.98)';
         ctx.fill();
