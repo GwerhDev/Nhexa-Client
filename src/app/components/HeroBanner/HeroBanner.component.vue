@@ -358,12 +358,12 @@ export default defineComponent({
     // sit straight at cursor coordinates.
     let W = slideHero.clientWidth;
     let H = slideHero.clientHeight;
-    const scene    = new THREE.Scene();
-    const camera   = new THREE.OrthographicCamera(0, W, 0, H, -1000, 1000);
-    const renderer = new THREE.WebGLRenderer({ canvas: glowCanvas, alpha: true, antialias: true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.setClearColor(0x000000, 0);
-    renderer.setSize(W, H, false);
+    const smokeScene    = new THREE.Scene();
+    const smokeCamera   = new THREE.OrthographicCamera(0, W, 0, H, -1000, 1000);
+    const smokeRenderer = new THREE.WebGLRenderer({ canvas: glowCanvas, alpha: true, antialias: true });
+    smokeRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    smokeRenderer.setClearColor(0x000000, 0);
+    smokeRenderer.setSize(W, H, false);
 
     // Cool-white smoke colour (slight blue tint) — same for every puff.
     const SMOKE_COLOR = new THREE.Color(0.80, 0.87, 0.97);
@@ -389,7 +389,7 @@ export default defineComponent({
       });
       const sprite = new THREE.Sprite(mat);
       sprite.visible = false;
-      scene.add(sprite);
+      smokeScene.add(sprite);
       pool.push({ sprite, born: 0, active: false, x: 0, y: 0, seed: 0, dx: 0, swirl: 0, spin: 0, base: 0 });
     }
 
@@ -410,7 +410,7 @@ export default defineComponent({
       p.sprite.visible = true;
     };
 
-    const animate = (now: number) => {
+    const animateSmoke = (now: number) => {
       for (const p of pool) {
         if (!p.active) continue;
         const age = (now - p.born) / LIFE;
@@ -429,18 +429,18 @@ export default defineComponent({
         const fadeIn = Math.min(1, age * 7);
         (p.sprite.material as THREE.SpriteMaterial).opacity = fadeIn * fresh * fresh * 0.15;
       }
-      renderer.render(scene, camera);
-      requestAnimationFrame(animate);
+      smokeRenderer.render(smokeScene, smokeCamera);
+      requestAnimationFrame(animateSmoke);
     };
-    requestAnimationFrame(animate);
+    requestAnimationFrame(animateSmoke);
 
     window.addEventListener('resize', () => {
       W = slideHero.clientWidth;
       H = slideHero.clientHeight;
-      camera.right = W;
-      camera.bottom = H;
-      camera.updateProjectionMatrix();
-      renderer.setSize(W, H, false);
+      smokeCamera.right = W;
+      smokeCamera.bottom = H;
+      smokeCamera.updateProjectionMatrix();
+      smokeRenderer.setSize(W, H, false);
     });
 
     // Spawn puffs evenly ALONG the travelled path so fast movement never leaves
