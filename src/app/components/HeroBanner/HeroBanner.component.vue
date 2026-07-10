@@ -324,89 +324,150 @@ export default defineComponent({
     );
     observer.observe(this.$el);
 
-    // ── Blue glow orb that follows the cursor ─────────────────────────────────
+    // ── Ethereal white smoke trail (Three.js sprites) ────────────────────────
     const glowCanvas = this.$refs.glowCanvas as HTMLCanvasElement;
-    const ctx = glowCanvas.getContext('2d')!;
-    const slideHero = this.$refs.slideHero as HTMLElement;
+    const slideHero  = this.$refs.slideHero as HTMLElement;
 
-    const resizeCanvas = () => {
-      glowCanvas.width  = slideHero.clientWidth;
-      glowCanvas.height = slideHero.clientHeight;
-    };
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
-
-    // A short history of recent cursor positions — each fades on its own, so
-    // the orb leaves a soft glowing trail that dissolves behind it.
-    interface GlowPoint { x: number; y: number; t: number; }
-    const TRAIL_MS = 380;       // how long the trailing glow lingers
-    const trail: GlowPoint[] = [];
-    let curX = 0, curY = 0, insideHero = false;
-
-    // Ice-blue palette matching the reference orb.
-    const HALO_OUTER = 'rgba(60, 130, 255, ';
-    const HALO_INNER = 'rgba(150, 205, 255, ';
-
-    const render = (now: number) => {
-      ctx.clearRect(0, 0, glowCanvas.width, glowCanvas.height);
-      while (trail.length > 0 && now - trail[0].t > TRAIL_MS) trail.shift();
-
-      // Additive blending so overlapping glow builds up into light.
-      ctx.save();
-      ctx.globalCompositeOperation = 'lighter';
-
-      // Trailing halos — older = fainter and smaller.
-      for (const p of trail) {
-        const fresh = 1 - (now - p.t) / TRAIL_MS;
-        if (fresh <= 0) continue;
-        const k = fresh * fresh;
-        const r = 10 + fresh * 26;
-        const halo = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, r);
-        halo.addColorStop(0,   HALO_INNER + (0.10 * k) + ')');
-        halo.addColorStop(0.4, HALO_OUTER + (0.06 * k) + ')');
-        halo.addColorStop(1,   HALO_OUTER + '0)');
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
-        ctx.fillStyle = halo;
-        ctx.fill();
+    // Procedural soft smoke texture (radial falloff + faint noise) so overlapping
+    // copies read as wispy volumetric smoke — no external asset needed.
+    const makeSmokeTexture = () => {
+      const c = document.createElement('canvas');
+      c.width = c.height = 128;
+      const g = c.getContext('2d')!;
+      const base = g.createRadialGradient(64, 64, 0, 64, 64, 64);
+      base.addColorStop(0,    'rgba(255,255,255,1)');
+      base.addColorStop(0.4,  'rgba(255,255,255,0.4)');
+      base.addColorStop(1,    'rgba(255,255,255,0)');
+      g.fillStyle = base;
+      g.fillRect(0, 0, 128, 128);
+      for (let i = 0; i < 60; i++) {
+        const x = Math.random() * 128, y = Math.random() * 128, r = 6 + Math.random() * 30;
+        const ng = g.createRadialGradient(x, y, 0, x, y, r);
+        ng.addColorStop(0, `rgba(255,255,255,${Math.random() * 0.05})`);
+        ng.addColorStop(1, 'rgba(255,255,255,0)');
+        g.fillStyle = ng;
+        g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.fill();
       }
-
-      // Bright orb at the cursor head
-      if (insideHero) {
-        // Soft halo
-        const halo = ctx.createRadialGradient(curX, curY, 0, curX, curY, 48);
-        halo.addColorStop(0,    HALO_INNER + '0.22)');
-        halo.addColorStop(0.25, HALO_OUTER + '0.13)');
-        halo.addColorStop(1,    HALO_OUTER + '0)');
-        ctx.beginPath();
-        ctx.arc(curX, curY, 48, 0, Math.PI * 2);
-        ctx.fillStyle = halo;
-        ctx.fill();
-
-        // Bright concentrated core
-        const core = ctx.createRadialGradient(curX, curY, 0, curX, curY, 8);
-        core.addColorStop(0, 'rgba(225, 245, 255, 0.85)');
-        core.addColorStop(0.5, 'rgba(150, 210, 255, 0.55)');
-        core.addColorStop(1, 'rgba(120, 190, 255, 0)');
-        ctx.beginPath();
-        ctx.arc(curX, curY, 8, 0, Math.PI * 2);
-        ctx.fillStyle = core;
-        ctx.fill();
-      }
-
-      ctx.restore();
-      requestAnimationFrame(render);
+      const tex = new THREE.CanvasTexture(c);
+      tex.needsUpdate = true;
+      return tex;
     };
-    requestAnimationFrame(render);
+    const smokeTexture = makeSmokeTexture();
+
+    // Orthographic camera in CSS-pixel space (y=0 top → y=H bottom) so sprites
+    // sit straight at cursor coordinates.
+    let W = slideHero.clientWidth;
+    let H = slideHero.clientHeight;
+    const scene    = new THREE.Scene();
+    const camera   = new THREE.OrthographicCamera(0, W, 0, H, -1000, 1000);
+    const renderer = new THREE.WebGLRenderer({ canvas: glowCanvas, alpha: true, antialias: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setClearColor(0x000000, 0);
+    renderer.setSize(W, H, false);
+
+    // Cool-white smoke colour (slight blue tint) — same for every puff.
+    const SMOKE_COLOR = new THREE.Color(0.80, 0.87, 0.97);
+
+    const LIFE = 2000;         // ms a puff lives (long, so it lingers and disperses)
+    const POOL = 320;          // reused sprite slots (ring buffer)
+
+    interface Puff {
+      sprite: THREE.Sprite; born: number; active: boolean;
+      x: number; y: number; seed: number; dx: number; swirl: number; spin: number; base: number;
+    }
+
+    const pool: Puff[] = [];
+    for (let i = 0; i < POOL; i++) {
+      const mat = new THREE.SpriteMaterial({
+        map: smokeTexture,
+        color: SMOKE_COLOR,
+        blending: THREE.AdditiveBlending,
+        transparent: true,
+        depthTest: false,
+        depthWrite: false,
+        opacity: 0,
+      });
+      const sprite = new THREE.Sprite(mat);
+      sprite.visible = false;
+      scene.add(sprite);
+      pool.push({ sprite, born: 0, active: false, x: 0, y: 0, seed: 0, dx: 0, swirl: 0, spin: 0, base: 0 });
+    }
+
+    let ring = 0;
+
+    const spawnPuff = (px: number, py: number, now: number) => {
+      const p = pool[ring];
+      ring = (ring + 1) % POOL;             // recycle oldest slot
+      p.active = true;
+      p.born = now;
+      p.x = px + (Math.random() - 0.5) * 12;
+      p.y = py + (Math.random() - 0.5) * 12;
+      p.seed = Math.random() * Math.PI * 2;
+      p.dx = (Math.random() - 0.5) * 1.2;
+      p.swirl = (Math.random() - 0.5) * 5;  // rotation speed → curling wisps
+      p.spin = (Math.random() - 0.5) * 0.8;
+      p.base = 60 + Math.random() * 80;     // px size
+      p.sprite.visible = true;
+    };
+
+    const animate = (now: number) => {
+      for (const p of pool) {
+        if (!p.active) continue;
+        const age = (now - p.born) / LIFE;
+        if (age >= 1) { p.active = false; p.sprite.visible = false; continue; }
+        const fresh = 1 - age;
+        // Curling motion: orbit the spawn point while rising, so wisps spiral.
+        const ang = p.seed + age * p.swirl;
+        const rad = age * 40;
+        const x = p.x + Math.cos(ang) * rad + p.dx * age * 46;
+        const y = p.y - age * age * 90 + Math.sin(ang) * rad * 0.6;
+        p.sprite.position.set(x, y, 0);
+        const scale = p.base * (0.5 + age * 2.2);          // billows outward
+        p.sprite.scale.set(scale, scale, 1);
+        p.sprite.material.rotation += p.spin * 0.012;
+        // Fade in quickly, out slowly; keep it subtle.
+        const fadeIn = Math.min(1, age * 7);
+        (p.sprite.material as THREE.SpriteMaterial).opacity = fadeIn * fresh * fresh * 0.15;
+      }
+      renderer.render(scene, camera);
+      requestAnimationFrame(animate);
+    };
+    requestAnimationFrame(animate);
+
+    window.addEventListener('resize', () => {
+      W = slideHero.clientWidth;
+      H = slideHero.clientHeight;
+      camera.right = W;
+      camera.bottom = H;
+      camera.updateProjectionMatrix();
+      renderer.setSize(W, H, false);
+    });
+
+    // Spawn puffs evenly ALONG the travelled path so fast movement never leaves
+    // gaps — a continuous stream of overlapping smoke.
+    const SPAWN_STEP = 8;      // px between puffs along the path
+    let lastX: number | null = null;
+    let lastY: number | null = null;
 
     slideHero.addEventListener('mousemove', (e: MouseEvent) => {
       const rect = slideHero.getBoundingClientRect();
-      curX = e.clientX - rect.left;
-      curY = e.clientY - rect.top;
-      insideHero = true;
-      trail.push({ x: curX, y: curY, t: performance.now() });
+      const mx = e.clientX - rect.left;
+      const my = e.clientY - rect.top;
+      const now = performance.now();
+
+      if (lastX === null) { spawnPuff(mx, my, now); lastX = mx; lastY = my; return; }
+      const dx = mx - lastX;
+      const dy = my - (lastY as number);
+      const steps = Math.max(1, Math.round(Math.hypot(dx, dy) / SPAWN_STEP));
+      for (let s = 1; s <= steps; s++) {
+        const f = s / steps;
+        spawnPuff(lastX + dx * f, (lastY as number) + dy * f, now);
+      }
+      lastX = mx;
+      lastY = my;
     });
-    slideHero.addEventListener('mouseleave', () => { insideHero = false; });
+    // Reset the anchor so re-entering doesn't streak a line across the slide.
+    slideHero.addEventListener('mouseleave', () => { lastX = null; lastY = null; });
   },
 });
 </script>
