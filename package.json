@@ -23,7 +23,7 @@
     "three": "^0.182.0",
     "vue": "^3.3.4",
     "vue-router": "^4.2.4",
-    "webgl-fluid": "^0.4.0"
+    "webgl-fluid-enhanced": "^0.8.0"
   },
   "devDependencies": {
     "@babel/core": "^7.22.11",

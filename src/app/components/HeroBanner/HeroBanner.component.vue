@@ -15,7 +15,7 @@
       <!-- First slide: text + action on the left, 3D element on the right -->
       <swiper-slide>
         <div class="hero-content hero-content--glow" ref="slideHero">
-          <canvas ref="glowCanvas" class="glow-canvas" aria-hidden="true"></canvas>
+          <div ref="fluidContainer" class="glow-canvas" aria-hidden="true"></div>
           <section class="section-left">
             <span class="color-white">
               <h1 class="color-white bold">CONECTA TUS <b class="featured">SENTIDOS</b></h1>
@@ -65,7 +65,7 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import SpinnerLoaderComponent from '../Loaders/SpinnerLoader.component.vue';
-import WebGLFluid from 'webgl-fluid';
+import WebGLFluidEnhanced from 'webgl-fluid-enhanced';
 import { HERO_APPS } from '../../../middlewares/misc/apps.data';
 
 const logoUrl = "https://streamby.s3.sa-east-1.amazonaws.com/be4dce92-de7c-4820-8f93-b3ea3335575d/3d-models/74fad9f9-ff8f-4ac1-ada3-3476b8dc82cd.glb";
@@ -325,43 +325,74 @@ export default defineComponent({
     );
     observer.observe(this.$el);
 
-    // ── GPU fluid-simulation trail (WebGL-Fluid-Simulation) ───────────────────
-    // This is the same simulation the reference site (hi3d.ai) uses — a
-    // Navier-Stokes solver where the cursor injects dye + velocity. Config
-    // values mirror the reference.
-    const glowCanvas = this.$refs.glowCanvas as HTMLCanvasElement;
+    // ── GPU fluid-simulation trail (webgl-fluid-enhanced) ─────────────────────
+    // Same Navier-Stokes solver the reference site (hi3d.ai) uses. We drive the
+    // splats manually so the dye is mostly WHITE when the cursor moves slowly
+    // and becomes more colourful (hue transitioning over time) the faster it
+    // moves.
+    const fluidContainer = this.$refs.fluidContainer as HTMLElement;
     const slideHero = this.$refs.slideHero as HTMLElement;
 
-    WebGLFluid(glowCanvas, {
-      IMMEDIATE: true,
-      TRIGGER: 'hover',
-      SIM_RESOLUTION: 128,
-      DYE_RESOLUTION: 1024,
-      DENSITY_DISSIPATION: 3.5,
-      VELOCITY_DISSIPATION: 2,
-      PRESSURE: 0.1,
-      PRESSURE_ITERATIONS: 20,
-      CURL: 3,
-      SPLAT_RADIUS: 0.2,
-      SPLAT_FORCE: 6000,
-      SHADING: true,
-      COLORFUL: true,
-      COLOR_UPDATE_SPEED: 10,
-      TRANSPARENT: true,
-      BLOOM: true,
-      SUNRAYS: true,
+    const fluid = new WebGLFluidEnhanced(fluidContainer);
+    fluid.setConfig({
+      simResolution: 128,
+      dyeResolution: 1024,
+      densityDissipation: 3.5,
+      velocityDissipation: 2,
+      pressure: 0.1,
+      pressureIterations: 20,
+      curl: 3,
+      splatRadius: 0.2,
+      splatForce: 6000,
+      shading: true,
+      colorful: false,   // we choose the colour per splat
+      hover: false,      // we drive splats ourselves
+      transparent: true,
+      bloom: true,
+      bloomIntensity: 0.35,
+      sunrays: false,
     });
+    fluid.start();
 
-    // The library binds its pointer listeners to the canvas, but the canvas is
-    // pointer-events:none (so it never blocks the 3D model or the CTA). Forward
-    // cursor movement over the whole slide as synthetic events on the canvas —
-    // dispatchEvent fires listeners regardless of pointer-events.
-    const forward = (type: string, e: MouseEvent) => {
-      glowCanvas.dispatchEvent(new MouseEvent(type, {
-        clientX: e.clientX, clientY: e.clientY, bubbles: false,
-      }));
+    const fluidCanvas = fluidContainer.querySelector('canvas') as HTMLCanvasElement;
+
+    const hslToHex = (h: number, s: number, l: number) => {
+      s /= 100; l /= 100;
+      const k = (n: number) => (n + h / 30) % 12;
+      const a = s * Math.min(l, 1 - l);
+      const f = (n: number) => {
+        const c = l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+        return Math.round(255 * c).toString(16).padStart(2, '0');
+      };
+      return `#${f(0)}${f(8)}${f(4)}`;
     };
-    slideHero.addEventListener('mousemove', (e) => forward('mousemove', e));
+
+    let lastCX: number | null = null;
+    let lastCY: number | null = null;
+
+    slideHero.addEventListener('mousemove', (e: MouseEvent) => {
+      if (!fluidCanvas) return;
+      const rect = slideHero.getBoundingClientRect();
+      const cssX = e.clientX - rect.left;
+      const cssY = e.clientY - rect.top;
+
+      if (lastCX === null) { lastCX = e.clientX; lastCY = e.clientY; return; }
+      const dx = e.clientX - lastCX;
+      const dy = e.clientY - (lastCY as number);
+      lastCX = e.clientX;
+      lastCY = e.clientY;
+
+      const speed = Math.hypot(dx, dy);
+      const speedNorm = Math.min(1, speed / 45);          // 0 slow → 1 fast
+      const hue = (performance.now() * 0.04) % 360;        // slow colour transition
+      const sat = speedNorm * 100;                         // white when slow, vivid when fast
+      const light = 16 + speedNorm * 6;                    // dim base (dye is ×10 internally)
+      const hex = hslToHex(hue, sat, light);
+
+      // splatAtLocation expects x in buffer px, y in CSS px.
+      const sx = cssX * (fluidCanvas.width / fluidCanvas.clientWidth);
+      fluid.splatAtLocation(sx, cssY, dx * 25, dy * 25, hex);
+    });
   },
 });
 </script>
