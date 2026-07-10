@@ -339,7 +339,7 @@ export default defineComponent({
     // Each point stores its creation timestamp so it expires automatically —
     // the trail fades on its own when the mouse stops moving.
     interface TrailPoint { x: number; y: number; t: number; }
-    const TRAIL_MS = 850;   // how long (ms) each point stays visible
+    const TRAIL_MS = 1000;   // how long (ms) each point stays visible
     const trail: TrailPoint[] = [];
     let insideHero = false;
 
@@ -385,32 +385,32 @@ export default defineComponent({
       while (trail.length > 0 && now - trail[0].t > TRAIL_MS) trail.shift();
 
       if (trail.length > 2) {
-        // Pass 1 — wide blurred glow layer
-        strokeRibbon(now, 26, (a) => `rgba(150, 210, 255, ${a * 0.32})`, 34, 'rgba(110, 190, 255, 0.6)');
-        // Pass 2 — mid halo
-        strokeRibbon(now, 10, (a) => `rgba(185, 228, 255, ${a * 0.5})`, 14, 'rgba(150, 215, 255, 0.7)');
-        // Pass 3 — thin bright core
-        strokeRibbon(now, 3.5, (a) => `rgba(230, 250, 255, ${a * 0.95})`, 0, 'transparent');
+        // Pass 1 — broad, barely-there aura
+        strokeRibbon(now, 64, (a) => `rgba(150, 210, 255, ${a * 0.06})`, 60, 'rgba(110, 190, 255, 0.28)');
+        // Pass 2 — soft glow
+        strokeRibbon(now, 30, (a) => `rgba(185, 228, 255, ${a * 0.09})`, 30, 'rgba(150, 215, 255, 0.32)');
+        // Pass 3 — faint luminous thread
+        strokeRibbon(now, 6, (a) => `rgba(235, 250, 255, ${a * 0.22})`, 10, 'rgba(210, 245, 255, 0.4)');
       }
 
-      // Bright orb at the cursor head
+      // Diffuse magical aura at the cursor head
       if (insideHero && trail.length > 0) {
         const h = trail[trail.length - 1];
 
-        const halo = ctx.createRadialGradient(h.x, h.y, 0, h.x, h.y, 40);
-        halo.addColorStop(0, 'rgba(205, 242, 255, 0.55)');
-        halo.addColorStop(0.4, 'rgba(140, 205, 255, 0.28)');
+        const halo = ctx.createRadialGradient(h.x, h.y, 0, h.x, h.y, 80);
+        halo.addColorStop(0, 'rgba(205, 242, 255, 0.16)');
+        halo.addColorStop(0.35, 'rgba(140, 205, 255, 0.08)');
         halo.addColorStop(1, 'rgba(100, 180, 255, 0)');
         ctx.beginPath();
-        ctx.arc(h.x, h.y, 40, 0, Math.PI * 2);
+        ctx.arc(h.x, h.y, 80, 0, Math.PI * 2);
         ctx.fillStyle = halo;
         ctx.fill();
 
         ctx.beginPath();
-        ctx.arc(h.x, h.y, 4, 0, Math.PI * 2);
-        ctx.shadowBlur  = 34;
-        ctx.shadowColor = 'rgba(180, 235, 255, 1)';
-        ctx.fillStyle   = 'rgba(242, 255, 255, 0.98)';
+        ctx.arc(h.x, h.y, 5, 0, Math.PI * 2);
+        ctx.shadowBlur  = 44;
+        ctx.shadowColor = 'rgba(180, 235, 255, 0.7)';
+        ctx.fillStyle   = 'rgba(242, 255, 255, 0.4)';
         ctx.fill();
         ctx.shadowBlur  = 0;
       }
