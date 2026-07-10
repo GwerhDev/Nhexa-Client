@@ -336,43 +336,55 @@ export default defineComponent({
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
 
-    // Each point stores its creation timestamp so it expires automatically —
-    // the trail fades on its own when the mouse stops moving.
-    interface TrailPoint { x: number; y: number; t: number; }
-    const TRAIL_MS = 1000;   // how long (ms) each point stays visible
+    // Each point carries a random seed + drift direction so that, as it ages,
+    // it rises and wobbles — dispersing organically like smoke rather than
+    // fading in place. `hue` gives every point an aurora tint.
+    interface TrailPoint { x: number; y: number; t: number; seed: number; dx: number; hue: number; }
+    const TRAIL_MS = 1400;   // how long (ms) each point stays visible
     const trail: TrailPoint[] = [];
     let insideHero = false;
+    let hueBase = 190;       // slowly drifting base hue (teal → violet range)
 
-    // Draw a smooth ribbon through the trail using quadratic curves between the
-    // midpoints of consecutive points. width/alpha taper from head (thick,
-    // bright) to tail (thin, faint); combining age-fade with position-taper.
-    const strokeRibbon = (now: number, baseWidth: number, color: (a: number) => string, blur: number, blurColor: string) => {
+    // Smoke-like displacement: older points drift up, expand sideways and wobble.
+    const disp = (p: TrailPoint, now: number) => {
+      const age = (now - p.t) / TRAIL_MS;                 // 0 (fresh) → 1 (dead)
+      const rise   = age * age * 46;                      // accelerating upward drift
+      const spread = Math.sin(p.seed + age * 4) * age * 26 + p.dx * age * 40;
+      const sway   = Math.cos(p.seed * 1.7 + age * 3) * age * 14;
+      return { x: p.x + spread, y: p.y - rise + sway };
+    };
+
+    // Draw a smooth ribbon through the displaced points using quadratic curves
+    // between midpoints. Width/alpha taper from head (thick) to tail (thin) and
+    // fade with age; colour follows each point's aurora hue.
+    const strokeRibbon = (now: number, baseWidth: number, alphaMul: number, sat: number, light: number, blur: number, blurAlpha: number) => {
       ctx.save();
       ctx.lineCap  = 'round';
       ctx.lineJoin = 'round';
-      ctx.shadowBlur  = blur;
-      ctx.shadowColor = blurColor;
       for (let i = 1; i < trail.length; i++) {
         const p0 = trail[i - 1];
         const p1 = trail[i];
         const prev = trail[i - 2] ?? p0;
         const next = trail[i + 1] ?? p1;
         const fresh = 1 - (now - p1.t) / TRAIL_MS;         // age fade (0..1)
-        const taper = i / (trail.length - 1);              // position along trail (0 tail → 1 head)
-        const k = fresh * (0.25 + 0.75 * taper);           // combined strength
+        const taper = i / (trail.length - 1);              // 0 tail → 1 head
+        const k = fresh * fresh * (0.2 + 0.8 * taper);     // smoke-like eased fade
         if (k <= 0) continue;
 
-        // Quadratic through midpoints keeps joins smooth even at speed.
-        const mid0x = (prev.x + p0.x) / 2, mid0y = (prev.y + p0.y) / 2;
-        const mid1x = (p0.x + p1.x) / 2,   mid1y = (p0.y + p1.y) / 2;
-        const mid2x = (p1.x + next.x) / 2, mid2y = (p1.y + next.y) / 2;
+        const a0 = disp(prev, now), b0 = disp(p0, now), c0 = disp(p1, now), d0 = disp(next, now);
+        const mid0x = (a0.x + b0.x) / 2, mid0y = (a0.y + b0.y) / 2;
+        const mid1x = (b0.x + c0.x) / 2, mid1y = (b0.y + c0.y) / 2;
+        const mid2x = (c0.x + d0.x) / 2, mid2y = (c0.y + d0.y) / 2;
 
         ctx.beginPath();
         ctx.moveTo(mid0x, mid0y);
-        ctx.quadraticCurveTo(p0.x, p0.y, mid1x, mid1y);
-        ctx.quadraticCurveTo(p1.x, p1.y, mid2x, mid2y);
-        ctx.lineWidth   = Math.max(0.5, baseWidth * k);
-        ctx.strokeStyle = color(k);
+        ctx.quadraticCurveTo(b0.x, b0.y, mid1x, mid1y);
+        ctx.quadraticCurveTo(c0.x, c0.y, mid2x, mid2y);
+        // Grow width as the point disperses, like a widening smoke plume.
+        ctx.lineWidth   = Math.max(0.5, baseWidth * k * (1 + (1 - fresh) * 1.6));
+        ctx.strokeStyle = `hsla(${p1.hue}, ${sat}%, ${light}%, ${k * alphaMul})`;
+        ctx.shadowBlur  = blur;
+        ctx.shadowColor = `hsla(${p1.hue}, ${sat}%, ${light}%, ${blurAlpha})`;
         ctx.stroke();
       }
       ctx.restore();
@@ -380,36 +392,36 @@ export default defineComponent({
 
     const renderTrail = (now: number) => {
       ctx.clearRect(0, 0, glowCanvas.width, glowCanvas.height);
+      hueBase = 175 + Math.sin(now / 4000) * 55;           // 120 (green) ↔ 230 (violet)
 
       // Drop expired points from the tail
       while (trail.length > 0 && now - trail[0].t > TRAIL_MS) trail.shift();
 
       if (trail.length > 2) {
-        // Pass 1 — broad, barely-there aura
-        strokeRibbon(now, 64, (a) => `rgba(150, 210, 255, ${a * 0.06})`, 60, 'rgba(110, 190, 255, 0.28)');
+        // Pass 1 — broad aurora aura
+        strokeRibbon(now, 70, 0.07, 90, 68, 62, 0.3);
         // Pass 2 — soft glow
-        strokeRibbon(now, 30, (a) => `rgba(185, 228, 255, ${a * 0.09})`, 30, 'rgba(150, 215, 255, 0.32)');
+        strokeRibbon(now, 34, 0.10, 85, 74, 32, 0.34);
         // Pass 3 — faint luminous thread
-        strokeRibbon(now, 6, (a) => `rgba(235, 250, 255, ${a * 0.22})`, 10, 'rgba(210, 245, 255, 0.4)');
+        strokeRibbon(now, 7,  0.22, 60, 90, 12, 0.4);
       }
 
-      // Diffuse magical aura at the cursor head
+      // Diffuse aurora aura at the cursor head
       if (insideHero && trail.length > 0) {
         const h = trail[trail.length - 1];
-
-        const halo = ctx.createRadialGradient(h.x, h.y, 0, h.x, h.y, 80);
-        halo.addColorStop(0, 'rgba(205, 242, 255, 0.16)');
-        halo.addColorStop(0.35, 'rgba(140, 205, 255, 0.08)');
-        halo.addColorStop(1, 'rgba(100, 180, 255, 0)');
+        const halo = ctx.createRadialGradient(h.x, h.y, 0, h.x, h.y, 90);
+        halo.addColorStop(0,    `hsla(${hueBase}, 90%, 72%, 0.16)`);
+        halo.addColorStop(0.35, `hsla(${hueBase + 40}, 85%, 66%, 0.08)`);
+        halo.addColorStop(1,    `hsla(${hueBase + 40}, 80%, 60%, 0)`);
         ctx.beginPath();
-        ctx.arc(h.x, h.y, 80, 0, Math.PI * 2);
+        ctx.arc(h.x, h.y, 90, 0, Math.PI * 2);
         ctx.fillStyle = halo;
         ctx.fill();
 
         ctx.beginPath();
         ctx.arc(h.x, h.y, 5, 0, Math.PI * 2);
-        ctx.shadowBlur  = 44;
-        ctx.shadowColor = 'rgba(180, 235, 255, 0.7)';
+        ctx.shadowBlur  = 46;
+        ctx.shadowColor = `hsla(${hueBase}, 90%, 80%, 0.7)`;
         ctx.fillStyle   = 'rgba(242, 255, 255, 0.4)';
         ctx.fill();
         ctx.shadowBlur  = 0;
@@ -422,7 +434,14 @@ export default defineComponent({
     slideHero.addEventListener('mousemove', (e: MouseEvent) => {
       const rect = slideHero.getBoundingClientRect();
       insideHero = true;
-      trail.push({ x: e.clientX - rect.left, y: e.clientY - rect.top, t: performance.now() });
+      trail.push({
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top,
+        t: performance.now(),
+        seed: Math.random() * Math.PI * 2,
+        dx: (Math.random() - 0.5) * 1.4,
+        hue: hueBase + (Math.random() - 0.5) * 30,
+      });
     });
     slideHero.addEventListener('mouseleave', () => { insideHero = false; });
   },
