@@ -324,7 +324,7 @@ export default defineComponent({
     );
     observer.observe(this.$el);
 
-    // ── Smoke-trail cursor effect ─────────────────────────────────────────────
+    // ── Cursor trail effect ───────────────────────────────────────────────────
     const glowCanvas = this.$refs.glowCanvas as HTMLCanvasElement;
     const ctx = glowCanvas.getContext('2d')!;
     const slideHero = this.$refs.slideHero as HTMLElement;
@@ -336,86 +336,81 @@ export default defineComponent({
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
 
-    interface Particle {
-      x: number; y: number;
-      vx: number; vy: number;
-      life: number;   // 1 → 0
-      size: number;
-    }
-
-    const particles: Particle[] = [];
-    let cursorX = -9999;
-    let cursorY = -9999;
+    // Each point stores its creation timestamp so it expires automatically —
+    // the trail fades on its own when the mouse stops moving.
+    interface TrailPoint { x: number; y: number; t: number; }
+    const TRAIL_MS = 700;   // how long (ms) each point stays visible
+    const trail: TrailPoint[] = [];
     let insideHero = false;
 
-    const spawnSmoke = (x: number, y: number) => {
-      for (let i = 0; i < 4; i++) {
-        const angle  = Math.random() * Math.PI * 2;
-        const speed  = 0.3 + Math.random() * 0.6;
-        particles.push({
-          x, y,
-          vx: Math.cos(angle) * speed * 0.4 + (Math.random() - 0.5) * 0.2,
-          vy: -speed * 0.9 - Math.random() * 0.4, // rises like smoke
-          life: 0.75 + Math.random() * 0.25,
-          size: 1.5 + Math.random() * 2,
-        });
-      }
-    };
-
-    const drawFrame = () => {
+    const renderTrail = (now: number) => {
       ctx.clearRect(0, 0, glowCanvas.width, glowCanvas.height);
 
-      // Update and draw smoke particles
-      for (let i = particles.length - 1; i >= 0; i--) {
-        const p = particles[i];
-        p.x    += p.vx;
-        p.y    += p.vy;
-        p.vx   *= 0.98;          // slight drag
-        p.vy   *= 0.98;
-        p.life -= 0.018;
-        p.size += 0.18;          // expands as it disperses
+      // Drop expired points from the tail
+      while (trail.length > 0 && now - trail[0].t > TRAIL_MS) trail.shift();
 
-        if (p.life <= 0) { particles.splice(i, 1); continue; }
+      if (trail.length > 1) {
+        ctx.lineCap  = 'round';
+        ctx.lineJoin = 'round';
 
-        const alpha = p.life * 0.45;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx.shadowBlur  = 14 * p.life;
-        ctx.shadowColor = `rgba(150, 210, 255, ${alpha * 0.7})`;
-        ctx.fillStyle   = `rgba(190, 225, 255, ${alpha})`;
-        ctx.fill();
-        ctx.shadowBlur  = 0;
+        // Pass 1 — wide blurred glow layer
+        ctx.save();
+        ctx.shadowBlur  = 20;
+        ctx.shadowColor = 'rgba(120, 195, 255, 0.55)';
+        for (let i = 1; i < trail.length; i++) {
+          const fresh = 1 - (now - trail[i].t) / TRAIL_MS;
+          ctx.beginPath();
+          ctx.moveTo(trail[i - 1].x, trail[i - 1].y);
+          ctx.lineTo(trail[i].x,     trail[i].y);
+          ctx.lineWidth   = 1 + fresh * 7;
+          ctx.strokeStyle = `rgba(155, 215, 255, ${fresh * 0.3})`;
+          ctx.stroke();
+        }
+        ctx.restore();
+
+        // Pass 2 — thin bright core
+        ctx.save();
+        for (let i = 1; i < trail.length; i++) {
+          const fresh = 1 - (now - trail[i].t) / TRAIL_MS;
+          ctx.beginPath();
+          ctx.moveTo(trail[i - 1].x, trail[i - 1].y);
+          ctx.lineTo(trail[i].x,     trail[i].y);
+          ctx.lineWidth   = fresh * 2;
+          ctx.strokeStyle = `rgba(225, 248, 255, ${fresh * 0.85})`;
+          ctx.stroke();
+        }
+        ctx.restore();
       }
 
-      // Bright orb at cursor
-      if (insideHero) {
-        const grad = ctx.createRadialGradient(cursorX, cursorY, 0, cursorX, cursorY, 22);
-        grad.addColorStop(0, 'rgba(210, 245, 255, 0.55)');
-        grad.addColorStop(1, 'rgba(100, 180, 255, 0)');
+      // Bright orb at the cursor head
+      if (insideHero && trail.length > 0) {
+        const h = trail[trail.length - 1];
+
+        const halo = ctx.createRadialGradient(h.x, h.y, 0, h.x, h.y, 24);
+        halo.addColorStop(0, 'rgba(205, 242, 255, 0.52)');
+        halo.addColorStop(1, 'rgba(100, 180, 255, 0)');
         ctx.beginPath();
-        ctx.arc(cursorX, cursorY, 22, 0, Math.PI * 2);
-        ctx.fillStyle = grad;
+        ctx.arc(h.x, h.y, 24, 0, Math.PI * 2);
+        ctx.fillStyle = halo;
         ctx.fill();
 
         ctx.beginPath();
-        ctx.arc(cursorX, cursorY, 2.5, 0, Math.PI * 2);
+        ctx.arc(h.x, h.y, 2.5, 0, Math.PI * 2);
         ctx.shadowBlur  = 28;
-        ctx.shadowColor = 'rgba(180, 230, 255, 1)';
-        ctx.fillStyle   = 'rgba(240, 255, 255, 0.95)';
+        ctx.shadowColor = 'rgba(180, 235, 255, 1)';
+        ctx.fillStyle   = 'rgba(242, 255, 255, 0.98)';
         ctx.fill();
         ctx.shadowBlur  = 0;
       }
 
-      requestAnimationFrame(drawFrame);
+      requestAnimationFrame(renderTrail);
     };
-    requestAnimationFrame(drawFrame);
+    requestAnimationFrame(renderTrail);
 
     slideHero.addEventListener('mousemove', (e: MouseEvent) => {
       const rect = slideHero.getBoundingClientRect();
-      cursorX    = e.clientX - rect.left;
-      cursorY    = e.clientY - rect.top;
       insideHero = true;
-      spawnSmoke(cursorX, cursorY);
+      trail.push({ x: e.clientX - rect.left, y: e.clientY - rect.top, t: performance.now() });
     });
     slideHero.addEventListener('mouseleave', () => { insideHero = false; });
   },
