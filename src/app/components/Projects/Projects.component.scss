@@ -3,6 +3,7 @@
   display: flex;
   justify-content: center;
   padding-block: 4rem;
+  position: relative;
 }
 
 .inner-container {
@@ -36,51 +37,145 @@
   -webkit-text-fill-color: transparent;
 }
 
+// Bento grid: featured card spans the full width, the rest share two columns.
 .project-grid {
   display: grid;
-  // Cards fill the full width, wrapping responsively.
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 1.5rem;
+
+  .project-card:first-child {
+    grid-column: 1 / -1;
+  }
+
+  @media (max-width: 860px) {
+    grid-template-columns: 1fr;
+
+    .project-card:first-child {
+      grid-column: auto;
+    }
+  }
 }
 
+// Reference-style card: dark, rounded, faint border, a coloured glow bleeding
+// from the media side, plus a subtle dotted texture. Text left, media right.
 .project-card {
   --card-accent: var(--primary-color);
+  position: relative;
+  isolation: isolate;
   display: flex;
-  flex-direction: column;
-  border-radius: 12px;
+  align-items: center;
+  gap: 1.75rem;
+  padding: 1.75rem;
+  border-radius: 20px;
   overflow: hidden;
   color: var(--nhexa-white);
-  background: var(--components-background);
-  border: solid 1px rgba(105, 105, 105, 0.35);
-  transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  border: solid 1px rgba(255, 255, 255, 0.08);
+  background:
+    radial-gradient(ellipse 65% 110% at 100% 60%, color-mix(in oklch, var(--card-accent) 34%, transparent), transparent 60%),
+    linear-gradient(145deg, rgb(22, 23, 29) 0%, rgb(13, 14, 19) 60%, rgb(10, 11, 15) 100%);
+  transition: border-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+
+  // Subtle dotted texture, like the reference cards.
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    background-size: 22px 22px;
+  }
 
   &:hover {
-    border-color: var(--card-accent);
-    box-shadow: 0 16px 40px -16px var(--card-accent);
+    transform: translateY(-4px);
+    border-color: color-mix(in oklch, var(--card-accent) 55%, transparent);
+    box-shadow: 0 20px 50px -20px color-mix(in oklch, var(--card-accent) 70%, transparent);
   }
 
-  // Alternate the hover motion so the cards don't all behave the same.
-  &:nth-child(odd):hover {
-    transform: translateY(-6px);
+  @media (max-width: 860px) {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1.25rem;
+  }
+}
+
+// GPU fluid cursor effect, behind the card content.
+.card-fx {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  border-radius: inherit;
+  z-index: 0;
+
+  @media (max-width: 1080px) {
+    display: none;
+  }
+}
+
+.project-body {
+  position: relative;
+  z-index: 2;              // text above the fluid effect
+  flex: 1;
+
+  h3 {
+    margin: 0 0 0.6rem;
+    font-size: 1.45rem;
+    font-weight: 700;
   }
 
-  &:nth-child(even):hover {
-    transform: scale(1.03);
+  p {
+    margin: 0;
+    max-width: 46ch;
+    color: rgba(229, 229, 229, 0.68);
+    line-height: 1.6;
   }
 }
 
 .project-media {
   position: relative;
-  width: 100%;
-  aspect-ratio: 16 / 10;
-  background: var(--components-background-solid);
+  z-index: 2;              // image/placeholder above the fluid effect
+  flex: 1;
+  align-self: stretch;
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  overflow: hidden;
+}
 
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-  }
+// Themed placeholder — projects without real media yet.
+.project-media--placeholder {
+  border: dashed 1px color-mix(in oklch, var(--card-accent) 42%, rgba(255, 255, 255, 0.12));
+  background:
+    radial-gradient(ellipse 85% 90% at 50% 45%, color-mix(in oklch, var(--card-accent) 22%, transparent), transparent 70%),
+    rgba(10, 12, 16, 0.4);
+}
+
+.soon-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.65rem;
+  color: color-mix(in oklch, var(--card-accent) 60%, var(--nhexa-white));
+}
+
+.soon-icon {
+  font-size: 2.6rem;
+  animation: soon-pulse 2.4s ease-in-out infinite;
+}
+
+.soon-label {
+  font-size: 0.82rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+
+@keyframes soon-pulse {
+  0%, 100% { opacity: 0.55; transform: translateY(0); }
+  50%      { opacity: 1;    transform: translateY(-3px); }
 }
 
 .status-badge {
@@ -92,6 +187,7 @@
   letter-spacing: 0.04em;
   padding: 0.25rem 0.7rem;
   border-radius: 999px;
+  backdrop-filter: blur(6px);
 
   &.status-badge--dev {
     color: #1a1205;
@@ -100,30 +196,14 @@
 
   &.status-badge--soon {
     color: var(--nhexa-white);
-    background: rgba(10, 14, 18, 0.7);
-    border: solid 1px rgba(229, 229, 229, 0.4);
-  }
-}
-
-
-.project-body {
-  padding: 1.5rem;
-
-  h3 {
-    margin: 0 0 0.5rem;
-    font-size: 1.4rem;
-  }
-
-  p {
-    margin: 0;
-    opacity: 0.85;
-    line-height: 1.6;
+    background: rgba(10, 14, 18, 0.55);
+    border: solid 1px rgba(229, 229, 229, 0.35);
   }
 }
 
 @media (max-width: 1080px) {
   .projects {
     padding-block: 2.5rem;
-    padding-inline: .5rem;
+    padding-inline: 0.5rem;
   }
 }
