@@ -65,6 +65,7 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import SpinnerLoaderComponent from '../Loaders/SpinnerLoader.component.vue';
+import WebGLFluid from 'webgl-fluid';
 import { HERO_APPS } from '../../../middlewares/misc/apps.data';
 
 const logoUrl = "https://streamby.s3.sa-east-1.amazonaws.com/be4dce92-de7c-4820-8f93-b3ea3335575d/3d-models/74fad9f9-ff8f-4ac1-ada3-3476b8dc82cd.glb";
@@ -324,125 +325,43 @@ export default defineComponent({
     );
     observer.observe(this.$el);
 
-    // ── Ethereal white smoke trail (2D canvas) ───────────────────────────────
+    // ── GPU fluid-simulation trail (WebGL-Fluid-Simulation) ───────────────────
+    // This is the same simulation the reference site (hi3d.ai) uses — a
+    // Navier-Stokes solver where the cursor injects dye + velocity. Config
+    // values mirror the reference.
     const glowCanvas = this.$refs.glowCanvas as HTMLCanvasElement;
-    const ctx = glowCanvas.getContext('2d')!;
     const slideHero = this.$refs.slideHero as HTMLElement;
 
-    const resizeCanvas = () => {
-      glowCanvas.width  = slideHero.clientWidth;
-      glowCanvas.height = slideHero.clientHeight;
-    };
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
-
-    // Pre-render a soft cool-white smoke sprite once (radial falloff + faint
-    // noise). Drawing many rotated/scaled copies reads as wispy volumetric smoke.
-    const smokeTex = document.createElement('canvas');
-    smokeTex.width = smokeTex.height = 128;
-    {
-      const g = smokeTex.getContext('2d')!;
-      const base = g.createRadialGradient(64, 64, 0, 64, 64, 64);
-      base.addColorStop(0,   'rgba(210, 226, 245, 0.9)');
-      base.addColorStop(0.4, 'rgba(200, 218, 240, 0.35)');
-      base.addColorStop(1,   'rgba(200, 218, 240, 0)');
-      g.fillStyle = base;
-      g.fillRect(0, 0, 128, 128);
-      for (let i = 0; i < 60; i++) {
-        const x = Math.random() * 128, y = Math.random() * 128, r = 6 + Math.random() * 30;
-        const ng = g.createRadialGradient(x, y, 0, x, y, r);
-        ng.addColorStop(0, `rgba(220, 232, 250, ${Math.random() * 0.06})`);
-        ng.addColorStop(1, 'rgba(220, 232, 250, 0)');
-        g.fillStyle = ng;
-        g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.fill();
-      }
-    }
-
-    const LIFE = 2000;         // ms a puff lives (lingers and disperses)
-    const POOL = 320;          // reused puff slots (ring buffer)
-
-    interface Puff {
-      born: number; active: boolean;
-      x: number; y: number; seed: number; dx: number; swirl: number; rot: number; spin: number; base: number;
-    }
-
-    const pool: Puff[] = [];
-    for (let i = 0; i < POOL; i++) {
-      pool.push({ born: 0, active: false, x: 0, y: 0, seed: 0, dx: 0, swirl: 0, rot: 0, spin: 0, base: 0 });
-    }
-    let ring = 0;
-
-    const spawnPuff = (px: number, py: number, now: number) => {
-      const p = pool[ring];
-      ring = (ring + 1) % POOL;             // recycle oldest slot
-      p.active = true;
-      p.born = now;
-      p.x = px + (Math.random() - 0.5) * 12;
-      p.y = py + (Math.random() - 0.5) * 12;
-      p.seed = Math.random() * Math.PI * 2;
-      p.dx = (Math.random() - 0.5) * 1.2;
-      p.swirl = (Math.random() - 0.5) * 5;  // orbit speed → curling wisps
-      p.rot = Math.random() * Math.PI * 2;
-      p.spin = (Math.random() - 0.5) * 0.8;
-      p.base = 70 + Math.random() * 90;     // px size
-    };
-
-    const renderSmoke = (now: number) => {
-      ctx.clearRect(0, 0, glowCanvas.width, glowCanvas.height);
-      ctx.save();
-      ctx.globalCompositeOperation = 'lighter';
-      for (const p of pool) {
-        if (!p.active) continue;
-        const age = (now - p.born) / LIFE;
-        if (age >= 1) { p.active = false; continue; }
-        const fresh = 1 - age;
-        // Curling motion: orbit the spawn point while rising, so wisps spiral.
-        const ang = p.seed + age * p.swirl;
-        const rad = age * 40;
-        const x = p.x + Math.cos(ang) * rad + p.dx * age * 46;
-        const y = p.y - age * age * 90 + Math.sin(ang) * rad * 0.6;
-        const size = p.base * (0.5 + age * 2.2);           // billows outward
-        const fadeIn = Math.min(1, age * 7);
-        const alpha = fadeIn * fresh * fresh * 0.07;
-        p.rot += p.spin * 0.012;
-
-        ctx.globalAlpha = alpha;
-        ctx.setTransform(1, 0, 0, 1, x, y);
-        ctx.rotate(p.rot);
-        ctx.drawImage(smokeTex, -size / 2, -size / 2, size, size);
-      }
-      ctx.setTransform(1, 0, 0, 1, 0, 0);
-      ctx.globalAlpha = 1;
-      ctx.restore();
-      requestAnimationFrame(renderSmoke);
-    };
-    requestAnimationFrame(renderSmoke);
-
-    // Spawn puffs evenly ALONG the travelled path so fast movement never leaves
-    // gaps — a continuous stream of overlapping smoke.
-    const SPAWN_STEP = 16;     // px between puffs along the path
-    let lastX: number | null = null;
-    let lastY: number | null = null;
-
-    slideHero.addEventListener('mousemove', (e: MouseEvent) => {
-      const rect = slideHero.getBoundingClientRect();
-      const mx = e.clientX - rect.left;
-      const my = e.clientY - rect.top;
-      const now = performance.now();
-
-      if (lastX === null) { spawnPuff(mx, my, now); lastX = mx; lastY = my; return; }
-      const dx = mx - lastX;
-      const dy = my - (lastY as number);
-      const steps = Math.max(1, Math.round(Math.hypot(dx, dy) / SPAWN_STEP));
-      for (let s = 1; s <= steps; s++) {
-        const f = s / steps;
-        spawnPuff(lastX + dx * f, (lastY as number) + dy * f, now);
-      }
-      lastX = mx;
-      lastY = my;
+    WebGLFluid(glowCanvas, {
+      IMMEDIATE: true,
+      TRIGGER: 'hover',
+      SIM_RESOLUTION: 128,
+      DYE_RESOLUTION: 1024,
+      DENSITY_DISSIPATION: 3.5,
+      VELOCITY_DISSIPATION: 2,
+      PRESSURE: 0.1,
+      PRESSURE_ITERATIONS: 20,
+      CURL: 3,
+      SPLAT_RADIUS: 0.2,
+      SPLAT_FORCE: 6000,
+      SHADING: true,
+      COLORFUL: true,
+      COLOR_UPDATE_SPEED: 10,
+      TRANSPARENT: true,
+      BLOOM: true,
+      SUNRAYS: true,
     });
-    // Reset the anchor so re-entering doesn't streak a line across the slide.
-    slideHero.addEventListener('mouseleave', () => { lastX = null; lastY = null; });
+
+    // The library binds its pointer listeners to the canvas, but the canvas is
+    // pointer-events:none (so it never blocks the 3D model or the CTA). Forward
+    // cursor movement over the whole slide as synthetic events on the canvas —
+    // dispatchEvent fires listeners regardless of pointer-events.
+    const forward = (type: string, e: MouseEvent) => {
+      glowCanvas.dispatchEvent(new MouseEvent(type, {
+        clientX: e.clientX, clientY: e.clientY, bubbles: false,
+      }));
+    };
+    slideHero.addEventListener('mousemove', (e) => forward('mousemove', e));
   },
 });
 </script>
