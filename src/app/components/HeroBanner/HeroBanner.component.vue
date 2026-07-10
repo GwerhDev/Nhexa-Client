@@ -403,7 +403,7 @@ export default defineComponent({
         const y = p.y - age * age * 90 + Math.sin(ang) * rad * 0.6;
         const size = p.base * (0.5 + age * 2.2);           // billows outward
         const fadeIn = Math.min(1, age * 7);
-        const alpha = fadeIn * fresh * fresh * 0.35;
+        const alpha = fadeIn * fresh * fresh * 0.07;
         p.rot += p.spin * 0.012;
 
         ctx.globalAlpha = alpha;
@@ -420,7 +420,7 @@ export default defineComponent({
 
     // Spawn puffs evenly ALONG the travelled path so fast movement never leaves
     // gaps — a continuous stream of overlapping smoke.
-    const SPAWN_STEP = 8;      // px between puffs along the path
+    const SPAWN_STEP = 16;     // px between puffs along the path
     let lastX: number | null = null;
     let lastY: number | null = null;
 
