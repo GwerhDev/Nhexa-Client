@@ -324,7 +324,7 @@ export default defineComponent({
     );
     observer.observe(this.$el);
 
-    // ── Cursor trail effect ───────────────────────────────────────────────────
+    // ── Blue glow orb that follows the cursor ─────────────────────────────────
     const glowCanvas = this.$refs.glowCanvas as HTMLCanvasElement;
     const ctx = glowCanvas.getContext('2d')!;
     const slideHero = this.$refs.slideHero as HTMLElement;
@@ -336,110 +336,77 @@ export default defineComponent({
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
 
-    // Each puff carries a random seed + drift so it rises, expands and wobbles
-    // as it ages — a volumetric smoke cloud, not a line. `hue` gives it colour.
-    interface Puff { x: number; y: number; t: number; seed: number; dx: number; r0: number; hue: number; }
-    const TRAIL_MS = 1500;   // how long (ms) each puff lives
-    const MAX_PUFFS = 480;
-    const puffs: Puff[] = [];
-    let insideHero = false;
-    let hueBase = 190;
+    // A short history of recent cursor positions — each fades on its own, so
+    // the orb leaves a soft glowing trail that dissolves behind it.
+    interface GlowPoint { x: number; y: number; t: number; }
+    const TRAIL_MS = 520;       // how long the trailing glow lingers
+    const trail: GlowPoint[] = [];
+    let curX = 0, curY = 0, insideHero = false;
 
-    // Smoke-like displacement: older puffs drift up, spread sideways and wobble.
-    const disp = (p: Puff, age: number) => {
-      const rise   = age * age * 60;                       // accelerating upward drift
-      const spread = Math.sin(p.seed + age * 3.5) * age * 30 + p.dx * age * 50;
-      const sway   = Math.cos(p.seed * 1.7 + age * 2.5) * age * 18;
-      return { x: p.x + spread, y: p.y - rise + sway };
-    };
+    // Ice-blue palette matching the reference orb.
+    const HALO_OUTER = 'rgba(60, 130, 255, ';
+    const HALO_INNER = 'rgba(150, 205, 255, ';
 
-    const renderTrail = (now: number) => {
+    const render = (now: number) => {
       ctx.clearRect(0, 0, glowCanvas.width, glowCanvas.height);
-      // Fast, wide colour cycling so several hues live in the trail at once.
-      hueBase = (now / 22) % 360;
+      while (trail.length > 0 && now - trail[0].t > TRAIL_MS) trail.shift();
 
-      // Drop expired puffs
-      while (puffs.length > 0 && now - puffs[0].t > TRAIL_MS) puffs.shift();
-
-      // Additive blending: overlapping puffs of different hues mix into light.
+      // Additive blending so overlapping glow builds up into light.
       ctx.save();
       ctx.globalCompositeOperation = 'lighter';
-      for (const p of puffs) {
-        const age = (now - p.t) / TRAIL_MS;                // 0 fresh → 1 dead
-        if (age >= 1) continue;
-        const fresh = 1 - age;
-        const k = fresh * fresh;                           // eased fade
-        const d = disp(p, age);
-        const r = p.r0 * (0.5 + age * 3.2);                // billows outward as it ages
-        const alpha = k * 0.13;
-        const grad = ctx.createRadialGradient(d.x, d.y, 0, d.x, d.y, r);
-        grad.addColorStop(0,   `hsla(${p.hue}, 95%, 72%, ${alpha})`);
-        grad.addColorStop(0.5, `hsla(${p.hue}, 90%, 60%, ${alpha * 0.5})`);
-        grad.addColorStop(1,   `hsla(${p.hue}, 90%, 55%, 0)`);
+
+      // Trailing halos — older = fainter and smaller.
+      for (const p of trail) {
+        const fresh = 1 - (now - p.t) / TRAIL_MS;
+        if (fresh <= 0) continue;
+        const k = fresh * fresh;
+        const r = 24 + fresh * 70;
+        const halo = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, r);
+        halo.addColorStop(0,   HALO_INNER + (0.18 * k) + ')');
+        halo.addColorStop(0.4, HALO_OUTER + (0.10 * k) + ')');
+        halo.addColorStop(1,   HALO_OUTER + '0)');
         ctx.beginPath();
-        ctx.arc(d.x, d.y, r, 0, Math.PI * 2);
-        ctx.fillStyle = grad;
+        ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+        ctx.fillStyle = halo;
         ctx.fill();
       }
 
-      // Bright luminous core at the cursor head
-      if (insideHero && puffs.length > 0) {
-        const h = puffs[puffs.length - 1];
-        const core = ctx.createRadialGradient(h.x, h.y, 0, h.x, h.y, 26);
-        core.addColorStop(0, `hsla(${hueBase}, 100%, 85%, 0.6)`);
-        core.addColorStop(1, `hsla(${hueBase}, 100%, 70%, 0)`);
+      // Bright orb at the cursor head
+      if (insideHero) {
+        // Wide soft halo
+        const halo = ctx.createRadialGradient(curX, curY, 0, curX, curY, 110);
+        halo.addColorStop(0,    HALO_INNER + '0.45)');
+        halo.addColorStop(0.25, HALO_OUTER + '0.30)');
+        halo.addColorStop(1,    HALO_OUTER + '0)');
         ctx.beginPath();
-        ctx.arc(h.x, h.y, 26, 0, Math.PI * 2);
+        ctx.arc(curX, curY, 110, 0, Math.PI * 2);
+        ctx.fillStyle = halo;
+        ctx.fill();
+
+        // Bright concentrated core
+        const core = ctx.createRadialGradient(curX, curY, 0, curX, curY, 16);
+        core.addColorStop(0, 'rgba(225, 245, 255, 0.95)');
+        core.addColorStop(0.5, 'rgba(150, 210, 255, 0.7)');
+        core.addColorStop(1, 'rgba(120, 190, 255, 0)');
+        ctx.beginPath();
+        ctx.arc(curX, curY, 16, 0, Math.PI * 2);
         ctx.fillStyle = core;
         ctx.fill();
       }
+
       ctx.restore();
-
-      requestAnimationFrame(renderTrail);
+      requestAnimationFrame(render);
     };
-    requestAnimationFrame(renderTrail);
-
-    // Spawn puffs evenly ALONG the path travelled since the last event (not
-    // once per event), so fast movement fills gaps and the smoke stays a
-    // continuous stream. Hues spread wide so several colours appear together.
-    const SPAWN_STEP = 5;     // px between puffs along the path
-    let lastX: number | null = null;
-    let lastY: number | null = null;
-
-    const addPuff = (px: number, py: number, t: number) => {
-      if (puffs.length >= MAX_PUFFS) puffs.shift();
-      puffs.push({
-        x: px + (Math.random() - 0.5) * 6,
-        y: py + (Math.random() - 0.5) * 6,
-        t,
-        seed: Math.random() * Math.PI * 2,
-        dx: (Math.random() - 0.5) * 1.6,
-        r0: 16 + Math.random() * 16,
-        hue: hueBase + (Math.random() - 0.5) * 70,         // wide spread → mixed colours
-      });
-    };
+    requestAnimationFrame(render);
 
     slideHero.addEventListener('mousemove', (e: MouseEvent) => {
       const rect = slideHero.getBoundingClientRect();
-      const mx = e.clientX - rect.left;
-      const my = e.clientY - rect.top;
-      const t = performance.now();
+      curX = e.clientX - rect.left;
+      curY = e.clientY - rect.top;
       insideHero = true;
-
-      if (lastX === null) { addPuff(mx, my, t); lastX = mx; lastY = my; return; }
-      const dx = mx - lastX;
-      const dy = my - (lastY as number);
-      const dist = Math.hypot(dx, dy);
-      const steps = Math.max(1, Math.round(dist / SPAWN_STEP));
-      for (let s = 1; s <= steps; s++) {
-        const f = s / steps;
-        addPuff(lastX + dx * f, (lastY as number) + dy * f, t);
-      }
-      lastX = mx;
-      lastY = my;
+      trail.push({ x: curX, y: curY, t: performance.now() });
     });
-    // Reset the anchor so re-entering doesn't streak a line across the slide.
-    slideHero.addEventListener('mouseleave', () => { insideHero = false; lastX = null; lastY = null; });
+    slideHero.addEventListener('mouseleave', () => { insideHero = false; });
   },
 });
 </script>
