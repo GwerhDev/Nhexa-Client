@@ -14,7 +14,8 @@
     >
       <!-- First slide: text + action on the left, 3D element on the right -->
       <swiper-slide>
-        <div class="hero-content">
+        <div class="hero-content hero-content--glow" ref="slideHero">
+          <canvas ref="glowCanvas" class="glow-canvas" aria-hidden="true"></canvas>
           <section class="section-left">
             <span class="color-white">
               <h1 class="color-white bold">CONECTA TUS <b class="featured">SENTIDOS</b></h1>
@@ -322,6 +323,101 @@ export default defineComponent({
       { threshold: 0.1 }
     );
     observer.observe(this.$el);
+
+    // ── Smoke-trail cursor effect ─────────────────────────────────────────────
+    const glowCanvas = this.$refs.glowCanvas as HTMLCanvasElement;
+    const ctx = glowCanvas.getContext('2d')!;
+    const slideHero = this.$refs.slideHero as HTMLElement;
+
+    const resizeCanvas = () => {
+      glowCanvas.width  = slideHero.clientWidth;
+      glowCanvas.height = slideHero.clientHeight;
+    };
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    interface Particle {
+      x: number; y: number;
+      vx: number; vy: number;
+      life: number;   // 1 → 0
+      size: number;
+    }
+
+    const particles: Particle[] = [];
+    let cursorX = -9999;
+    let cursorY = -9999;
+    let insideHero = false;
+
+    const spawnSmoke = (x: number, y: number) => {
+      for (let i = 0; i < 4; i++) {
+        const angle  = Math.random() * Math.PI * 2;
+        const speed  = 0.3 + Math.random() * 0.6;
+        particles.push({
+          x, y,
+          vx: Math.cos(angle) * speed * 0.4 + (Math.random() - 0.5) * 0.2,
+          vy: -speed * 0.9 - Math.random() * 0.4, // rises like smoke
+          life: 0.75 + Math.random() * 0.25,
+          size: 1.5 + Math.random() * 2,
+        });
+      }
+    };
+
+    const drawFrame = () => {
+      ctx.clearRect(0, 0, glowCanvas.width, glowCanvas.height);
+
+      // Update and draw smoke particles
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x    += p.vx;
+        p.y    += p.vy;
+        p.vx   *= 0.98;          // slight drag
+        p.vy   *= 0.98;
+        p.life -= 0.018;
+        p.size += 0.18;          // expands as it disperses
+
+        if (p.life <= 0) { particles.splice(i, 1); continue; }
+
+        const alpha = p.life * 0.45;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.shadowBlur  = 14 * p.life;
+        ctx.shadowColor = `rgba(150, 210, 255, ${alpha * 0.7})`;
+        ctx.fillStyle   = `rgba(190, 225, 255, ${alpha})`;
+        ctx.fill();
+        ctx.shadowBlur  = 0;
+      }
+
+      // Bright orb at cursor
+      if (insideHero) {
+        const grad = ctx.createRadialGradient(cursorX, cursorY, 0, cursorX, cursorY, 22);
+        grad.addColorStop(0, 'rgba(210, 245, 255, 0.55)');
+        grad.addColorStop(1, 'rgba(100, 180, 255, 0)');
+        ctx.beginPath();
+        ctx.arc(cursorX, cursorY, 22, 0, Math.PI * 2);
+        ctx.fillStyle = grad;
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.arc(cursorX, cursorY, 2.5, 0, Math.PI * 2);
+        ctx.shadowBlur  = 28;
+        ctx.shadowColor = 'rgba(180, 230, 255, 1)';
+        ctx.fillStyle   = 'rgba(240, 255, 255, 0.95)';
+        ctx.fill();
+        ctx.shadowBlur  = 0;
+      }
+
+      requestAnimationFrame(drawFrame);
+    };
+    requestAnimationFrame(drawFrame);
+
+    slideHero.addEventListener('mousemove', (e: MouseEvent) => {
+      const rect = slideHero.getBoundingClientRect();
+      cursorX    = e.clientX - rect.left;
+      cursorY    = e.clientY - rect.top;
+      insideHero = true;
+      spawnSmoke(cursorX, cursorY);
+    });
+    slideHero.addEventListener('mouseleave', () => { insideHero = false; });
   },
 });
 </script>
