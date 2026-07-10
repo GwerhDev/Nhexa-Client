@@ -340,7 +340,7 @@ export default defineComponent({
     // as it ages — a volumetric smoke cloud, not a line. `hue` gives it colour.
     interface Puff { x: number; y: number; t: number; seed: number; dx: number; r0: number; hue: number; }
     const TRAIL_MS = 1500;   // how long (ms) each puff lives
-    const MAX_PUFFS = 260;
+    const MAX_PUFFS = 480;
     const puffs: Puff[] = [];
     let insideHero = false;
     let hueBase = 190;
@@ -399,28 +399,47 @@ export default defineComponent({
     };
     requestAnimationFrame(renderTrail);
 
-    // Spawn a small cluster of puffs per move so the smoke reads as a body,
-    // with a spread of hues so multiple colours appear together.
+    // Spawn puffs evenly ALONG the path travelled since the last event (not
+    // once per event), so fast movement fills gaps and the smoke stays a
+    // continuous stream. Hues spread wide so several colours appear together.
+    const SPAWN_STEP = 5;     // px between puffs along the path
+    let lastX: number | null = null;
+    let lastY: number | null = null;
+
+    const addPuff = (px: number, py: number, t: number) => {
+      if (puffs.length >= MAX_PUFFS) puffs.shift();
+      puffs.push({
+        x: px + (Math.random() - 0.5) * 6,
+        y: py + (Math.random() - 0.5) * 6,
+        t,
+        seed: Math.random() * Math.PI * 2,
+        dx: (Math.random() - 0.5) * 1.6,
+        r0: 16 + Math.random() * 16,
+        hue: hueBase + (Math.random() - 0.5) * 70,         // wide spread → mixed colours
+      });
+    };
+
     slideHero.addEventListener('mousemove', (e: MouseEvent) => {
       const rect = slideHero.getBoundingClientRect();
       const mx = e.clientX - rect.left;
       const my = e.clientY - rect.top;
-      insideHero = true;
       const t = performance.now();
-      for (let i = 0; i < 3; i++) {
-        if (puffs.length >= MAX_PUFFS) puffs.shift();
-        puffs.push({
-          x: mx + (Math.random() - 0.5) * 14,
-          y: my + (Math.random() - 0.5) * 14,
-          t,
-          seed: Math.random() * Math.PI * 2,
-          dx: (Math.random() - 0.5) * 1.6,
-          r0: 14 + Math.random() * 16,
-          hue: hueBase + (Math.random() - 0.5) * 70,       // wide spread → mixed colours
-        });
+      insideHero = true;
+
+      if (lastX === null) { addPuff(mx, my, t); lastX = mx; lastY = my; return; }
+      const dx = mx - lastX;
+      const dy = my - (lastY as number);
+      const dist = Math.hypot(dx, dy);
+      const steps = Math.max(1, Math.round(dist / SPAWN_STEP));
+      for (let s = 1; s <= steps; s++) {
+        const f = s / steps;
+        addPuff(lastX + dx * f, (lastY as number) + dy * f, t);
       }
+      lastX = mx;
+      lastY = my;
     });
-    slideHero.addEventListener('mouseleave', () => { insideHero = false; });
+    // Reset the anchor so re-entering doesn't streak a line across the slide.
+    slideHero.addEventListener('mouseleave', () => { insideHero = false; lastX = null; lastY = null; });
   },
 });
 </script>
