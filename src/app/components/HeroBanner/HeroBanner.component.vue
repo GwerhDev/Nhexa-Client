@@ -336,112 +336,89 @@ export default defineComponent({
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
 
-    // Each point carries a random seed + drift direction so that, as it ages,
-    // it rises and wobbles — dispersing organically like smoke rather than
-    // fading in place. `hue` gives every point an aurora tint.
-    interface TrailPoint { x: number; y: number; t: number; seed: number; dx: number; hue: number; }
-    const TRAIL_MS = 1400;   // how long (ms) each point stays visible
-    const trail: TrailPoint[] = [];
+    // Each puff carries a random seed + drift so it rises, expands and wobbles
+    // as it ages — a volumetric smoke cloud, not a line. `hue` gives it colour.
+    interface Puff { x: number; y: number; t: number; seed: number; dx: number; r0: number; hue: number; }
+    const TRAIL_MS = 1500;   // how long (ms) each puff lives
+    const MAX_PUFFS = 260;
+    const puffs: Puff[] = [];
     let insideHero = false;
-    let hueBase = 190;       // slowly drifting base hue (teal → violet range)
+    let hueBase = 190;
 
-    // Smoke-like displacement: older points drift up, expand sideways and wobble.
-    const disp = (p: TrailPoint, now: number) => {
-      const age = (now - p.t) / TRAIL_MS;                 // 0 (fresh) → 1 (dead)
-      const rise   = age * age * 46;                      // accelerating upward drift
-      const spread = Math.sin(p.seed + age * 4) * age * 26 + p.dx * age * 40;
-      const sway   = Math.cos(p.seed * 1.7 + age * 3) * age * 14;
+    // Smoke-like displacement: older puffs drift up, spread sideways and wobble.
+    const disp = (p: Puff, age: number) => {
+      const rise   = age * age * 60;                       // accelerating upward drift
+      const spread = Math.sin(p.seed + age * 3.5) * age * 30 + p.dx * age * 50;
+      const sway   = Math.cos(p.seed * 1.7 + age * 2.5) * age * 18;
       return { x: p.x + spread, y: p.y - rise + sway };
-    };
-
-    // Draw a smooth ribbon through the displaced points using quadratic curves
-    // between midpoints. Width/alpha taper from head (thick) to tail (thin) and
-    // fade with age; colour follows each point's aurora hue.
-    const strokeRibbon = (now: number, baseWidth: number, alphaMul: number, sat: number, light: number, blur: number, blurAlpha: number) => {
-      ctx.save();
-      ctx.lineCap  = 'round';
-      ctx.lineJoin = 'round';
-      for (let i = 1; i < trail.length; i++) {
-        const p0 = trail[i - 1];
-        const p1 = trail[i];
-        const prev = trail[i - 2] ?? p0;
-        const next = trail[i + 1] ?? p1;
-        const fresh = 1 - (now - p1.t) / TRAIL_MS;         // age fade (0..1)
-        const taper = i / (trail.length - 1);              // 0 tail → 1 head
-        const k = fresh * fresh * (0.2 + 0.8 * taper);     // smoke-like eased fade
-        if (k <= 0) continue;
-
-        const a0 = disp(prev, now), b0 = disp(p0, now), c0 = disp(p1, now), d0 = disp(next, now);
-        const mid0x = (a0.x + b0.x) / 2, mid0y = (a0.y + b0.y) / 2;
-        const mid1x = (b0.x + c0.x) / 2, mid1y = (b0.y + c0.y) / 2;
-        const mid2x = (c0.x + d0.x) / 2, mid2y = (c0.y + d0.y) / 2;
-
-        ctx.beginPath();
-        ctx.moveTo(mid0x, mid0y);
-        ctx.quadraticCurveTo(b0.x, b0.y, mid1x, mid1y);
-        ctx.quadraticCurveTo(c0.x, c0.y, mid2x, mid2y);
-        // Grow width as the point disperses, like a widening smoke plume.
-        ctx.lineWidth   = Math.max(0.5, baseWidth * k * (1 + (1 - fresh) * 1.6));
-        ctx.strokeStyle = `hsla(${p1.hue}, ${sat}%, ${light}%, ${k * alphaMul})`;
-        ctx.shadowBlur  = blur;
-        ctx.shadowColor = `hsla(${p1.hue}, ${sat}%, ${light}%, ${blurAlpha})`;
-        ctx.stroke();
-      }
-      ctx.restore();
     };
 
     const renderTrail = (now: number) => {
       ctx.clearRect(0, 0, glowCanvas.width, glowCanvas.height);
-      hueBase = 175 + Math.sin(now / 4000) * 55;           // 120 (green) ↔ 230 (violet)
+      // Fast, wide colour cycling so several hues live in the trail at once.
+      hueBase = (now / 22) % 360;
 
-      // Drop expired points from the tail
-      while (trail.length > 0 && now - trail[0].t > TRAIL_MS) trail.shift();
+      // Drop expired puffs
+      while (puffs.length > 0 && now - puffs[0].t > TRAIL_MS) puffs.shift();
 
-      if (trail.length > 2) {
-        // Pass 1 — broad aurora aura
-        strokeRibbon(now, 70, 0.07, 90, 68, 62, 0.3);
-        // Pass 2 — soft glow
-        strokeRibbon(now, 34, 0.10, 85, 74, 32, 0.34);
-        // Pass 3 — faint luminous thread
-        strokeRibbon(now, 7,  0.22, 60, 90, 12, 0.4);
+      // Additive blending: overlapping puffs of different hues mix into light.
+      ctx.save();
+      ctx.globalCompositeOperation = 'lighter';
+      for (const p of puffs) {
+        const age = (now - p.t) / TRAIL_MS;                // 0 fresh → 1 dead
+        if (age >= 1) continue;
+        const fresh = 1 - age;
+        const k = fresh * fresh;                           // eased fade
+        const d = disp(p, age);
+        const r = p.r0 * (0.5 + age * 3.2);                // billows outward as it ages
+        const alpha = k * 0.13;
+        const grad = ctx.createRadialGradient(d.x, d.y, 0, d.x, d.y, r);
+        grad.addColorStop(0,   `hsla(${p.hue}, 95%, 72%, ${alpha})`);
+        grad.addColorStop(0.5, `hsla(${p.hue}, 90%, 60%, ${alpha * 0.5})`);
+        grad.addColorStop(1,   `hsla(${p.hue}, 90%, 55%, 0)`);
+        ctx.beginPath();
+        ctx.arc(d.x, d.y, r, 0, Math.PI * 2);
+        ctx.fillStyle = grad;
+        ctx.fill();
       }
 
-      // Diffuse aurora aura at the cursor head
-      if (insideHero && trail.length > 0) {
-        const h = trail[trail.length - 1];
-        const halo = ctx.createRadialGradient(h.x, h.y, 0, h.x, h.y, 90);
-        halo.addColorStop(0,    `hsla(${hueBase}, 90%, 72%, 0.16)`);
-        halo.addColorStop(0.35, `hsla(${hueBase + 40}, 85%, 66%, 0.08)`);
-        halo.addColorStop(1,    `hsla(${hueBase + 40}, 80%, 60%, 0)`);
+      // Bright luminous core at the cursor head
+      if (insideHero && puffs.length > 0) {
+        const h = puffs[puffs.length - 1];
+        const core = ctx.createRadialGradient(h.x, h.y, 0, h.x, h.y, 26);
+        core.addColorStop(0, `hsla(${hueBase}, 100%, 85%, 0.6)`);
+        core.addColorStop(1, `hsla(${hueBase}, 100%, 70%, 0)`);
         ctx.beginPath();
-        ctx.arc(h.x, h.y, 90, 0, Math.PI * 2);
-        ctx.fillStyle = halo;
+        ctx.arc(h.x, h.y, 26, 0, Math.PI * 2);
+        ctx.fillStyle = core;
         ctx.fill();
-
-        ctx.beginPath();
-        ctx.arc(h.x, h.y, 5, 0, Math.PI * 2);
-        ctx.shadowBlur  = 46;
-        ctx.shadowColor = `hsla(${hueBase}, 90%, 80%, 0.7)`;
-        ctx.fillStyle   = 'rgba(242, 255, 255, 0.4)';
-        ctx.fill();
-        ctx.shadowBlur  = 0;
       }
+      ctx.restore();
 
       requestAnimationFrame(renderTrail);
     };
     requestAnimationFrame(renderTrail);
 
+    // Spawn a small cluster of puffs per move so the smoke reads as a body,
+    // with a spread of hues so multiple colours appear together.
     slideHero.addEventListener('mousemove', (e: MouseEvent) => {
       const rect = slideHero.getBoundingClientRect();
+      const mx = e.clientX - rect.left;
+      const my = e.clientY - rect.top;
       insideHero = true;
-      trail.push({
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top,
-        t: performance.now(),
-        seed: Math.random() * Math.PI * 2,
-        dx: (Math.random() - 0.5) * 1.4,
-        hue: hueBase + (Math.random() - 0.5) * 30,
-      });
+      const t = performance.now();
+      for (let i = 0; i < 3; i++) {
+        if (puffs.length >= MAX_PUFFS) puffs.shift();
+        puffs.push({
+          x: mx + (Math.random() - 0.5) * 14,
+          y: my + (Math.random() - 0.5) * 14,
+          t,
+          seed: Math.random() * Math.PI * 2,
+          dx: (Math.random() - 0.5) * 1.6,
+          r0: 14 + Math.random() * 16,
+          hue: hueBase + (Math.random() - 0.5) * 70,       // wide spread → mixed colours
+        });
+      }
     });
     slideHero.addEventListener('mouseleave', () => { insideHero = false; });
   },
