@@ -145,12 +145,13 @@
   overflow: hidden;
 }
 
-// Themed placeholder — projects without real media yet.
+// Themed placeholder — projects without real media yet. Opaque base so the
+// fluid effect passes cleanly BEHIND this container (not through it).
 .project-media--placeholder {
   border: dashed 1px color-mix(in oklch, var(--card-accent) 42%, rgba(255, 255, 255, 0.12));
   background:
     radial-gradient(ellipse 85% 90% at 50% 45%, color-mix(in oklch, var(--card-accent) 22%, transparent), transparent 70%),
-    rgba(10, 12, 16, 0.4);
+    rgb(13, 15, 20);
 }
 
 .soon-placeholder {
