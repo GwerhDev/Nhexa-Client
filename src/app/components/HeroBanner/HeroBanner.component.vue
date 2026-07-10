@@ -339,7 +339,7 @@ export default defineComponent({
     // A short history of recent cursor positions — each fades on its own, so
     // the orb leaves a soft glowing trail that dissolves behind it.
     interface GlowPoint { x: number; y: number; t: number; }
-    const TRAIL_MS = 520;       // how long the trailing glow lingers
+    const TRAIL_MS = 380;       // how long the trailing glow lingers
     const trail: GlowPoint[] = [];
     let curX = 0, curY = 0, insideHero = false;
 
@@ -360,10 +360,10 @@ export default defineComponent({
         const fresh = 1 - (now - p.t) / TRAIL_MS;
         if (fresh <= 0) continue;
         const k = fresh * fresh;
-        const r = 24 + fresh * 70;
+        const r = 10 + fresh * 26;
         const halo = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, r);
-        halo.addColorStop(0,   HALO_INNER + (0.18 * k) + ')');
-        halo.addColorStop(0.4, HALO_OUTER + (0.10 * k) + ')');
+        halo.addColorStop(0,   HALO_INNER + (0.10 * k) + ')');
+        halo.addColorStop(0.4, HALO_OUTER + (0.06 * k) + ')');
         halo.addColorStop(1,   HALO_OUTER + '0)');
         ctx.beginPath();
         ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
@@ -373,23 +373,23 @@ export default defineComponent({
 
       // Bright orb at the cursor head
       if (insideHero) {
-        // Wide soft halo
-        const halo = ctx.createRadialGradient(curX, curY, 0, curX, curY, 110);
-        halo.addColorStop(0,    HALO_INNER + '0.45)');
-        halo.addColorStop(0.25, HALO_OUTER + '0.30)');
+        // Soft halo
+        const halo = ctx.createRadialGradient(curX, curY, 0, curX, curY, 48);
+        halo.addColorStop(0,    HALO_INNER + '0.22)');
+        halo.addColorStop(0.25, HALO_OUTER + '0.13)');
         halo.addColorStop(1,    HALO_OUTER + '0)');
         ctx.beginPath();
-        ctx.arc(curX, curY, 110, 0, Math.PI * 2);
+        ctx.arc(curX, curY, 48, 0, Math.PI * 2);
         ctx.fillStyle = halo;
         ctx.fill();
 
         // Bright concentrated core
-        const core = ctx.createRadialGradient(curX, curY, 0, curX, curY, 16);
-        core.addColorStop(0, 'rgba(225, 245, 255, 0.95)');
-        core.addColorStop(0.5, 'rgba(150, 210, 255, 0.7)');
+        const core = ctx.createRadialGradient(curX, curY, 0, curX, curY, 8);
+        core.addColorStop(0, 'rgba(225, 245, 255, 0.85)');
+        core.addColorStop(0.5, 'rgba(150, 210, 255, 0.55)');
         core.addColorStop(1, 'rgba(120, 190, 255, 0)');
         ctx.beginPath();
-        ctx.arc(curX, curY, 16, 0, Math.PI * 2);
+        ctx.arc(curX, curY, 8, 0, Math.PI * 2);
         ctx.fillStyle = core;
         ctx.fill();
       }
