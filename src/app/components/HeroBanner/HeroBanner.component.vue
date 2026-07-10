@@ -324,75 +324,52 @@ export default defineComponent({
     );
     observer.observe(this.$el);
 
-    // ── Ethereal white smoke trail (Three.js sprites) ────────────────────────
+    // ── Ethereal white smoke trail (2D canvas) ───────────────────────────────
     const glowCanvas = this.$refs.glowCanvas as HTMLCanvasElement;
-    const slideHero  = this.$refs.slideHero as HTMLElement;
+    const ctx = glowCanvas.getContext('2d')!;
+    const slideHero = this.$refs.slideHero as HTMLElement;
 
-    // Procedural soft smoke texture (radial falloff + faint noise) so overlapping
-    // copies read as wispy volumetric smoke — no external asset needed.
-    const makeSmokeTexture = () => {
-      const c = document.createElement('canvas');
-      c.width = c.height = 128;
-      const g = c.getContext('2d')!;
+    const resizeCanvas = () => {
+      glowCanvas.width  = slideHero.clientWidth;
+      glowCanvas.height = slideHero.clientHeight;
+    };
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    // Pre-render a soft cool-white smoke sprite once (radial falloff + faint
+    // noise). Drawing many rotated/scaled copies reads as wispy volumetric smoke.
+    const smokeTex = document.createElement('canvas');
+    smokeTex.width = smokeTex.height = 128;
+    {
+      const g = smokeTex.getContext('2d')!;
       const base = g.createRadialGradient(64, 64, 0, 64, 64, 64);
-      base.addColorStop(0,    'rgba(255,255,255,1)');
-      base.addColorStop(0.4,  'rgba(255,255,255,0.4)');
-      base.addColorStop(1,    'rgba(255,255,255,0)');
+      base.addColorStop(0,   'rgba(210, 226, 245, 0.9)');
+      base.addColorStop(0.4, 'rgba(200, 218, 240, 0.35)');
+      base.addColorStop(1,   'rgba(200, 218, 240, 0)');
       g.fillStyle = base;
       g.fillRect(0, 0, 128, 128);
       for (let i = 0; i < 60; i++) {
         const x = Math.random() * 128, y = Math.random() * 128, r = 6 + Math.random() * 30;
         const ng = g.createRadialGradient(x, y, 0, x, y, r);
-        ng.addColorStop(0, `rgba(255,255,255,${Math.random() * 0.05})`);
-        ng.addColorStop(1, 'rgba(255,255,255,0)');
+        ng.addColorStop(0, `rgba(220, 232, 250, ${Math.random() * 0.06})`);
+        ng.addColorStop(1, 'rgba(220, 232, 250, 0)');
         g.fillStyle = ng;
         g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.fill();
       }
-      const tex = new THREE.CanvasTexture(c);
-      tex.needsUpdate = true;
-      return tex;
-    };
-    const smokeTexture = makeSmokeTexture();
+    }
 
-    // Orthographic camera in CSS-pixel space (y=0 top → y=H bottom) so sprites
-    // sit straight at cursor coordinates.
-    let W = slideHero.clientWidth;
-    let H = slideHero.clientHeight;
-    const smokeScene    = new THREE.Scene();
-    const smokeCamera   = new THREE.OrthographicCamera(0, W, 0, H, -1000, 1000);
-    const smokeRenderer = new THREE.WebGLRenderer({ canvas: glowCanvas, alpha: true, antialias: true });
-    smokeRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    smokeRenderer.setClearColor(0x000000, 0);
-    smokeRenderer.setSize(W, H, false);
-
-    // Cool-white smoke colour (slight blue tint) — same for every puff.
-    const SMOKE_COLOR = new THREE.Color(0.80, 0.87, 0.97);
-
-    const LIFE = 2000;         // ms a puff lives (long, so it lingers and disperses)
-    const POOL = 320;          // reused sprite slots (ring buffer)
+    const LIFE = 2000;         // ms a puff lives (lingers and disperses)
+    const POOL = 320;          // reused puff slots (ring buffer)
 
     interface Puff {
-      sprite: THREE.Sprite; born: number; active: boolean;
-      x: number; y: number; seed: number; dx: number; swirl: number; spin: number; base: number;
+      born: number; active: boolean;
+      x: number; y: number; seed: number; dx: number; swirl: number; rot: number; spin: number; base: number;
     }
 
     const pool: Puff[] = [];
     for (let i = 0; i < POOL; i++) {
-      const mat = new THREE.SpriteMaterial({
-        map: smokeTexture,
-        color: SMOKE_COLOR,
-        blending: THREE.AdditiveBlending,
-        transparent: true,
-        depthTest: false,
-        depthWrite: false,
-        opacity: 0,
-      });
-      const sprite = new THREE.Sprite(mat);
-      sprite.visible = false;
-      smokeScene.add(sprite);
-      pool.push({ sprite, born: 0, active: false, x: 0, y: 0, seed: 0, dx: 0, swirl: 0, spin: 0, base: 0 });
+      pool.push({ born: 0, active: false, x: 0, y: 0, seed: 0, dx: 0, swirl: 0, rot: 0, spin: 0, base: 0 });
     }
-
     let ring = 0;
 
     const spawnPuff = (px: number, py: number, now: number) => {
@@ -404,44 +381,42 @@ export default defineComponent({
       p.y = py + (Math.random() - 0.5) * 12;
       p.seed = Math.random() * Math.PI * 2;
       p.dx = (Math.random() - 0.5) * 1.2;
-      p.swirl = (Math.random() - 0.5) * 5;  // rotation speed → curling wisps
+      p.swirl = (Math.random() - 0.5) * 5;  // orbit speed → curling wisps
+      p.rot = Math.random() * Math.PI * 2;
       p.spin = (Math.random() - 0.5) * 0.8;
-      p.base = 60 + Math.random() * 80;     // px size
-      p.sprite.visible = true;
+      p.base = 70 + Math.random() * 90;     // px size
     };
 
-    const animateSmoke = (now: number) => {
+    const renderSmoke = (now: number) => {
+      ctx.clearRect(0, 0, glowCanvas.width, glowCanvas.height);
+      ctx.save();
+      ctx.globalCompositeOperation = 'lighter';
       for (const p of pool) {
         if (!p.active) continue;
         const age = (now - p.born) / LIFE;
-        if (age >= 1) { p.active = false; p.sprite.visible = false; continue; }
+        if (age >= 1) { p.active = false; continue; }
         const fresh = 1 - age;
         // Curling motion: orbit the spawn point while rising, so wisps spiral.
         const ang = p.seed + age * p.swirl;
         const rad = age * 40;
         const x = p.x + Math.cos(ang) * rad + p.dx * age * 46;
         const y = p.y - age * age * 90 + Math.sin(ang) * rad * 0.6;
-        p.sprite.position.set(x, y, 0);
-        const scale = p.base * (0.5 + age * 2.2);          // billows outward
-        p.sprite.scale.set(scale, scale, 1);
-        p.sprite.material.rotation += p.spin * 0.012;
-        // Fade in quickly, out slowly; keep it subtle.
+        const size = p.base * (0.5 + age * 2.2);           // billows outward
         const fadeIn = Math.min(1, age * 7);
-        (p.sprite.material as THREE.SpriteMaterial).opacity = fadeIn * fresh * fresh * 0.15;
-      }
-      smokeRenderer.render(smokeScene, smokeCamera);
-      requestAnimationFrame(animateSmoke);
-    };
-    requestAnimationFrame(animateSmoke);
+        const alpha = fadeIn * fresh * fresh * 0.35;
+        p.rot += p.spin * 0.012;
 
-    window.addEventListener('resize', () => {
-      W = slideHero.clientWidth;
-      H = slideHero.clientHeight;
-      smokeCamera.right = W;
-      smokeCamera.bottom = H;
-      smokeCamera.updateProjectionMatrix();
-      smokeRenderer.setSize(W, H, false);
-    });
+        ctx.globalAlpha = alpha;
+        ctx.setTransform(1, 0, 0, 1, x, y);
+        ctx.rotate(p.rot);
+        ctx.drawImage(smokeTex, -size / 2, -size / 2, size, size);
+      }
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.globalAlpha = 1;
+      ctx.restore();
+      requestAnimationFrame(renderSmoke);
+    };
+    requestAnimationFrame(renderSmoke);
 
     // Spawn puffs evenly ALONG the travelled path so fast movement never leaves
     // gaps — a continuous stream of overlapping smoke.
