@@ -345,11 +345,12 @@ export default defineComponent({
       SPLAT_RADIUS: 0.2,
       SPLAT_FORCE: 6000,
       SHADING: true,
-      COLORFUL: true,
-      COLOR_UPDATE_SPEED: 10,
+      COLORFUL: false,                              // no rainbow cycling
+      SPLAT_COLOR: { r: 0.11, g: 0.11, b: 0.13 },   // white dye (faint cool tint)
       TRANSPARENT: true,
       BLOOM: true,
-      SUNRAYS: true,
+      BLOOM_INTENSITY: 0.35,                         // less glow
+      SUNRAYS: false,                                // drop the bright light rays
     });
 
     // The library binds its pointer listeners to the canvas, but the canvas is
