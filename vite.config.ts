@@ -43,4 +43,19 @@ function imagesToWebp(): Plugin {
 export default defineConfig({
   plugins: [vue(), imagesToWebp()],
   assetsInclude: ['**/*.glb'],
+  build: {
+    rollupOptions: {
+      output: {
+        // Split heavy vendors into their own chunks so they load in parallel
+        // and stay cached across app deploys.
+        manualChunks(id) {
+          if (!id.includes('node_modules')) return;
+          if (id.includes('/three/') || id.includes('three/examples')) return 'three';
+          if (id.includes('webgl-fluid')) return 'webgl-fluid';
+          if (id.includes('/swiper/')) return 'swiper';
+          if (id.includes('@fortawesome')) return 'fontawesome';
+        },
+      },
+    },
+  },
 })

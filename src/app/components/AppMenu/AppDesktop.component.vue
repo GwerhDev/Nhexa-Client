@@ -273,7 +273,7 @@ function select(app: any) {
                 @click="select(app)"
               >
                 <img v-if="app.icon" :src="app.icon" :alt="app.label" class="app-icon" />
-                <font-awesome-icon v-else :icon="['fas', 'grid-2']" class="app-icon-fa" />
+                <font-awesome-icon v-else :icon="['fas', 'table-cells-large']" class="app-icon-fa" />
                 <span class="app-label">{{ app.label.toUpperCase() }}</span>
                 <span class="app-description">{{ app.description }}</span>
               </button>
