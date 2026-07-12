@@ -101,9 +101,14 @@ export default defineComponent({
   },
   async mounted() {
     // Load the heavy 3D/fluid libraries on demand (separate async chunks).
+    // The 3D model shows on every device; the fluid cursor trail is desktop-only
+    // (its canvas is hidden on mobile and its per-frame solver would just burn
+    // the main thread on low-power/touch devices). Honour reduced-motion too.
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const enableFluid = window.matchMedia('(min-width: 1081px)').matches && !prefersReducedMotion;
+
     const THREE = await import('three');
     const { GLTFLoader } = await import('three/examples/jsm/loaders/GLTFLoader.js');
-    const WebGLFluid = (await import('webgl-fluid')).default;
 
     let scene: THREE.Scene,
       camera: THREE.PerspectiveCamera,
@@ -128,7 +133,7 @@ export default defineComponent({
     // Renderer
     renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
     renderer.setSize(container.clientWidth, container.clientHeight);
-    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1;
     container.appendChild(renderer.domElement);
@@ -332,42 +337,45 @@ export default defineComponent({
     );
     observer.observe(this.$el);
 
-    // ── GPU fluid-simulation trail (WebGL-Fluid-Simulation) ───────────────────
-    // Same Navier-Stokes solver the reference (hi3d.ai) uses. One instance per
-    // slide (each slide has its own .glow-canvas). The canvas is
-    // pointer-events:none so it never blocks the 3D model or the CTA; cursor
-    // movement over each slide is forwarded as synthetic events on its canvas.
-    const fluidConfig = {
-      IMMEDIATE: true,
-      TRIGGER: 'hover',
-      SIM_RESOLUTION: 128,
-      DYE_RESOLUTION: 512,          // lower — several instances run at once
-      DENSITY_DISSIPATION: 3.5,
-      VELOCITY_DISSIPATION: 2,
-      PRESSURE: 0.1,
-      PRESSURE_ITERATIONS: 20,
-      CURL: 3,
-      SPLAT_RADIUS: 0.2,
-      SPLAT_FORCE: 6000,
-      SHADING: true,
-      COLORFUL: false,                              // no rainbow cycling
-      SPLAT_COLOR: { r: 0.05, g: 0.05, b: 0.06 },   // faint white dye (subtle, won't wash out slides)
-      TRANSPARENT: true,
-      BLOOM: true,
-      BLOOM_INTENSITY: 0.2,                          // minimal glow
-      SUNRAYS: false,                                // drop the bright light rays
-    };
+    // ── GPU fluid-simulation trail (WebGL-Fluid-Simulation) — desktop only ─────
+    // Same Navier-Stokes solver the reference (hi3d.ai) uses. Its canvas is
+    // pointer-events:none; cursor movement over each slide is forwarded to it.
+    // Skipped (not even downloaded) on mobile / reduced-motion to keep the main
+    // thread free — the per-frame solver was the dominant mobile TBT cost.
+    if (enableFluid) {
+      const WebGLFluid = (await import('webgl-fluid')).default;
+      const fluidConfig = {
+        IMMEDIATE: true,
+        TRIGGER: 'hover',
+        SIM_RESOLUTION: 128,
+        DYE_RESOLUTION: 512,          // lower — several instances run at once
+        DENSITY_DISSIPATION: 3.5,
+        VELOCITY_DISSIPATION: 2,
+        PRESSURE: 0.1,
+        PRESSURE_ITERATIONS: 20,
+        CURL: 3,
+        SPLAT_RADIUS: 0.2,
+        SPLAT_FORCE: 6000,
+        SHADING: true,
+        COLORFUL: false,                              // no rainbow cycling
+        SPLAT_COLOR: { r: 0.05, g: 0.05, b: 0.06 },   // faint white dye (subtle, won't wash out slides)
+        TRANSPARENT: true,
+        BLOOM: true,
+        BLOOM_INTENSITY: 0.2,                          // minimal glow
+        SUNRAYS: false,                                // drop the bright light rays
+      };
 
-    const canvases = Array.from(this.$el.querySelectorAll('canvas.glow-canvas')) as HTMLCanvasElement[];
-    canvases.forEach((canvas) => {
-      WebGLFluid(canvas, fluidConfig);
-      const host = canvas.parentElement;              // the slide's .hero-content
-      host?.addEventListener('mousemove', (e: MouseEvent) => {
-        canvas.dispatchEvent(new MouseEvent('mousemove', {
-          clientX: e.clientX, clientY: e.clientY, bubbles: false,
-        }));
+      const canvases = Array.from(this.$el.querySelectorAll('canvas.glow-canvas')) as HTMLCanvasElement[];
+      canvases.forEach((canvas) => {
+        WebGLFluid(canvas, fluidConfig);
+        const host = canvas.parentElement;              // the slide's .hero-content
+        host?.addEventListener('mousemove', (e: MouseEvent) => {
+          canvas.dispatchEvent(new MouseEvent('mousemove', {
+            clientX: e.clientX, clientY: e.clientY, bubbles: false,
+          }));
+        });
       });
-    });
+    }
   },
 });
 </script>
