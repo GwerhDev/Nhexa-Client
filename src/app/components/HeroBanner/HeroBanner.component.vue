@@ -107,6 +107,14 @@ export default defineComponent({
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const enableFluid = window.matchMedia('(min-width: 1081px)').matches && !prefersReducedMotion;
 
+    // Defer the heavy 3D setup until the browser is idle so the hero text/CSS
+    // paints first (better FCP/LCP/TBT); the model streams in shortly after.
+    await new Promise<void>((resolve) => {
+      const ric = (window as unknown as { requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => void }).requestIdleCallback;
+      if (ric) ric(() => resolve(), { timeout: 2000 });
+      else setTimeout(resolve, 200);
+    });
+
     const THREE = await import('three');
     const { GLTFLoader } = await import('three/examples/jsm/loaders/GLTFLoader.js');
 
@@ -203,8 +211,8 @@ export default defineComponent({
     mouseLight.position.set(0, 0, 3);
     scene.add(mouseLight);
 
-    // Particles
-    const PARTICLE_COUNT = 60;
+    // Particles — fewer on mobile / reduced-motion to lighten the render loop.
+    const PARTICLE_COUNT = enableFluid ? 60 : 24;
     const particlePositions = new Float32Array(PARTICLE_COUNT * 3);
     const particleVelocities: THREE.Vector3[] = [];
 
@@ -240,14 +248,16 @@ export default defineComponent({
     const particleSystem = new THREE.Points(particleGeometry, particleMaterial);
     scene.add(particleSystem);
 
-    // Animation
+    // Animation — pausable so the render loop stops while the hero is off-screen.
     let isDragging = false;
+    let running = false;
 
     const animate = () => {
+      if (!running) return;
       requestAnimationFrame(animate);
 
-      // Slow idle rotation when not dragging
-      if (!isDragging && model) {
+      // Slow idle rotation when not dragging (respect reduced-motion).
+      if (!isDragging && !prefersReducedMotion && model) {
         model.rotation.y += 0.002;
       }
 
@@ -264,7 +274,9 @@ export default defineComponent({
 
       renderer.render(scene, camera);
     };
-    animate();
+    const startLoop = () => { if (!running) { running = true; animate(); } };
+    const stopLoop = () => { running = false; };
+    startLoop();
     let prevMouseX = 0;
     let prevMouseY = 0;
 
@@ -324,13 +336,16 @@ export default defineComponent({
       renderer.setSize(container.clientWidth, container.clientHeight);
     });
 
-    // Pause autoplay when the banner scrolls out of view
+    // Pause autoplay AND the 3D render loop when the banner scrolls out of view
+    // (both mobile and desktop) — no point spending frames on an off-screen canvas.
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
           this.swiperInstance?.autoplay?.start();
+          startLoop();
         } else {
           this.swiperInstance?.autoplay?.stop();
+          stopLoop();
         }
       },
       { threshold: 0.1 }
