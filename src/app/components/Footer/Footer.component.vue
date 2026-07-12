@@ -21,7 +21,7 @@
             <h4>Explorar</h4>
             <router-link to="/#manifesto">Manifiesto</router-link>
             <router-link to="/#apps">Aplicaciones</router-link>
-            <router-link to="/support">Soporte</router-link>
+            <router-link to="/#support">Soporte</router-link>
           </div>
           <div class="footer-col">
             <h4>Síguenos</h4>
