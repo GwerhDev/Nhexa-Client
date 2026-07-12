@@ -69,7 +69,7 @@ function search() {
         v-model="query"
         @keyup.enter="search"
       >
-      <button type="button" @click="search">
+      <button type="button" @click="search" aria-label="Buscar">
         <font-awesome-icon :icon="['fas', 'magnifying-glass']" />
       </button>
     </div>

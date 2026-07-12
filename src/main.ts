@@ -15,6 +15,7 @@ import {
   faArrowRight, faBars, faChevronDown, faChevronRight, faCodeBranch, faComments,
   faDownload, faFeatherPointed, faFilm, faTableCellsLarge, faHeadset, faHouse, faLayerGroup,
   faMagnifyingGlass, faMicrochip, faPeopleGroup, faPhotoFilm, faWandMagicSparkles, faXmark,
+  faHourglassHalf, faScrewdriverWrench, faSpinner, faUser,
 } from '@fortawesome/free-solid-svg-icons';
 import { faGithub, faInstagram, faLinkedin } from '@fortawesome/free-brands-svg-icons';
 
@@ -22,6 +23,7 @@ library.add(
   faArrowRight, faBars, faChevronDown, faChevronRight, faCodeBranch, faComments,
   faDownload, faFeatherPointed, faFilm, faTableCellsLarge, faHeadset, faHouse, faLayerGroup,
   faMagnifyingGlass, faMicrochip, faPeopleGroup, faPhotoFilm, faWandMagicSparkles, faXmark,
+  faHourglassHalf, faScrewdriverWrench, faSpinner, faUser,
   faGithub, faInstagram, faLinkedin,
 );
 

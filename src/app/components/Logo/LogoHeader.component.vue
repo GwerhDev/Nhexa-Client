@@ -4,7 +4,7 @@
 
 <template>
   <div class="logotype">
-    <img src="../../../assets/svg/nhexa-logo.svg" height="200">
+    <img src="../../../assets/svg/nhexa-logo.svg" height="200" alt="NHEXA Interface">
     <p class="type">NHEXA</p>
   </div>
 </template>

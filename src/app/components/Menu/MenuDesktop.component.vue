@@ -98,7 +98,7 @@ function search() {
       <ul class="ul-search">
         <li>
           <input type="text" placeholder="Buscar..." v-model="query" @keyup.enter="search">
-          <button @click="search">
+          <button @click="search" aria-label="Buscar">
             <font-awesome-icon :icon="['fas', 'magnifying-glass']" />
           </button>
         </li>
