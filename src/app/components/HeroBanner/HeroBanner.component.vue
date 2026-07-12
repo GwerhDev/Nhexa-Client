@@ -58,15 +58,16 @@
 
 <script lang="ts">
 import { defineComponent, markRaw } from 'vue';
-import * as THREE from "three";
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+// three, its GLTFLoader and webgl-fluid are imported dynamically inside
+// mounted() so they load as separate async chunks off the initial critical
+// path (type-only import keeps the TS annotations with zero runtime cost).
+import type * as THREE from "three";
 import { Swiper, SwiperSlide } from 'swiper/vue';
 import { Navigation, Pagination, Autoplay } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import SpinnerLoaderComponent from '../Loaders/SpinnerLoader.component.vue';
-import WebGLFluid from 'webgl-fluid';
 import { HERO_APPS } from '../../../middlewares/misc/apps.data';
 
 const logoUrl = "https://streamby.s3.sa-east-1.amazonaws.com/be4dce92-de7c-4820-8f93-b3ea3335575d/3d-models/74fad9f9-ff8f-4ac1-ada3-3476b8dc82cd.glb";
@@ -98,7 +99,12 @@ export default defineComponent({
       this.swiperInstance = swiper;
     },
   },
-  mounted() {
+  async mounted() {
+    // Load the heavy 3D/fluid libraries on demand (separate async chunks).
+    const THREE = await import('three');
+    const { GLTFLoader } = await import('three/examples/jsm/loaders/GLTFLoader.js');
+    const WebGLFluid = (await import('webgl-fluid')).default;
+
     let scene: THREE.Scene,
       camera: THREE.PerspectiveCamera,
       renderer: THREE.WebGLRenderer,
