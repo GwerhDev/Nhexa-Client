@@ -29,12 +29,18 @@ const pillars = [
   <section ref="el" class="manifesto reveal" id="manifesto">
     <div class="inner-container">
       <header class="manifesto-header">
-        <span class="eyebrow">Manifiesto</span>
+        <span class="eyebrow">Acerca de</span>
         <h2>Conecta tus <b class="featured">sentidos</b></h2>
         <p>
-          <b>NHEXA Interface</b> es un espacio de colaboración interdisciplinar para el
-          desarrollo autónomo de proyectos de medios interactivos, en retroalimentación
-          abierta con las comunidades a las que están dirigidos.
+          <b>Nhexa Interface</b> es un espacio donde disciplinas como la programación y lo
+          audiovisual colaboran para desarrollar proyectos interactivos.
+        </p>
+        <p>
+          Trabajamos desde lo colectivo, buscando producir contenidos que generen valor, no
+          solo desde una perspectiva económica, sino también como instancia de crecimiento
+          cooperativa y autónoma de los equipos. Nuestros proyectos se construyen en diálogo
+          comprometido y abierto con las comunidades a las que están dirigidos, para que
+          tengan sentido compartido y crezcan por sí mismos.
         </p>
       </header>
 

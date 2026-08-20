@@ -6,21 +6,20 @@ import { useReveal } from '../../../utils/useReveal';
 const el = ref<HTMLElement | null>(null);
 useReveal(el);
 
-// Hard-coded departments (placeholder copy for now).
 const departments = [
   {
-    id: 'animation',
-    name: 'Animación',
+    id: 'audiovisual',
+    name: 'Departamento Audiovisual',
     icon: ['fas', 'film'] as [string, string],
     accent: '#9b59b6',
-    text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+    text: 'Encargado de la producción de imágenes en movimiento, este departamento se enfoca en la experimentación medial, en el cruce entre lo análogo y lo digital, el 2d y el 3d, la imagen real y la animación, para la generación de experiencias inmersivas.',
   },
   {
-    id: 'technology',
-    name: 'Tecnología',
-    icon: ['fas', 'microchip'] as [string, string],
+    id: 'programming',
+    name: 'Departamento de Programación',
+    icon: ['fas', 'code-branch'] as [string, string],
     accent: '#27ae9b',
-    text: 'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+    text: 'Enfocado en el código abierto, este departamento busca la socialización de las nuevas tecnologías disponibles, a través de la generación de interfaces interactivas para usuarios y comunidades.',
   },
 ];
 </script>
