@@ -9,18 +9,33 @@ useReveal(el);
 const pillars = [
   {
     icon: ['fas', 'people-group'] as [string, string],
-    title: 'Colaboración interdisciplinar',
-    text: 'Reunimos disciplinas distintas en torno a proyectos comunes de medios interactivos.',
+    title: 'Comunidades coautoras',
+    text: 'Las comunidades dan vida a los proyectos, y en Nhexa, la retroalimentación y participación es una herramienta concreta para crear.',
   },
   {
-    icon: ['fas', 'code-branch'] as [string, string],
-    title: 'Desarrollo autónomo',
-    text: 'Herramientas propias para crear, publicar y distribuir sin intermediarios.',
+    icon: ['fas', 'people-arrows'] as [string, string],
+    title: 'Contra la Autoría Tradicional',
+    text: 'Adherimos a un esquema en donde las decisiones nacen del trabajo colectivo, para ser una red creativa que se fortalezca a través de la colaboración.',
   },
   {
-    icon: ['fas', 'comments'] as [string, string],
-    title: 'Retroalimentación abierta',
-    text: 'Construimos en diálogo constante con las comunidades a las que apuntamos.',
+    icon: ['fas', 'film'] as [string, string],
+    title: 'Hacer Cultura vs. Consumo Pasivo',
+    text: 'Buscamos que nuestros proyectos no sean solo entretenimiento efímero, sino que reflejen narrativas con un punto de vista que les sostengan en el tiempo.',
+  },
+  {
+    icon: ['fas', 'microchip'] as [string, string],
+    title: 'Tecnología como expresión humana',
+    text: 'Las tecnologías digitales no suelen ser medios neutros, pero al hacerlas propias se convierten en herramientas para construir nuevos mundos y formas de habitarlos.',
+  },
+  {
+    icon: ['fas', 'shield-halved'] as [string, string],
+    title: 'Autonomía digital',
+    text: 'Nhexa se posiciona en contra del lucro con la información privada, así como también se proyecta desde el código abierto como espacio de resistencia.',
+  },
+  {
+    icon: ['fas', 'universal-access'] as [string, string],
+    title: 'Accesibilidad y difusión',
+    text: 'Creemos que el arte, la cultura y el entretenimiento no deben ser excluyentes. Fomentamos el acceso libre y el conocimiento compartido.',
   },
 ];
 </script>
