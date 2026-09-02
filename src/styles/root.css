@@ -1,5 +1,6 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap');
+@import '@fontsource/ubuntu/400.css';
+@import '@fontsource/ubuntu/500.css';
+@import '@fontsource/ubuntu/700.css';
 
 @font-face {
   font-family: Game-Of-Squids;
@@ -17,7 +18,9 @@
 }
 
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  /* Self-hosted so the app looks the same regardless of OS, instead of falling back to
+     whatever "system" font that machine happens to have (Segoe UI on Windows, etc.). */
+  font-family: 'Ubuntu', -apple-system, system-ui, sans-serif;
   line-height: 1.5;
   font-weight: 400;
   display: flex;

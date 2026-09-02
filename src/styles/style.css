@@ -314,7 +314,7 @@
 .loader {
   width: 100%;
   font-weight: bold;
-  font-family: sans-serif;
+  font-family: inherit;
   font-size: 30px;
   padding-bottom: 8px;
   background: linear-gradient(currentColor 0 0) 0 100%/0% 3px no-repeat;
