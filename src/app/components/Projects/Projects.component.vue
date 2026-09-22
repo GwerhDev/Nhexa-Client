@@ -1,17 +1,33 @@
 <style scoped lang="scss" src="./Projects.component.scss" />
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import WebGLFluid from 'webgl-fluid';
 import { useReveal } from '../../../utils/useReveal';
 
 const el = ref<HTMLElement | null>(null);
 useReveal(el);
 
 // Same GPU fluid cursor effect as the hero — one instance per card, rendered
-// behind the card content, following the mouse.
-onMounted(() => {
+// behind the card content, following the mouse. Desktop-only and lazy-loaded,
+// same reasoning and pattern as HeroBanner: on mobile there's no real hover
+// to trigger it, and initializing three full WebGL solvers unconditionally
+// (one per card) was pure dead weight on the main thread there.
+onMounted(async () => {
   const section = el.value;
   if (!section) return;
+
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const enableFluid = window.matchMedia('(min-width: 1081px)').matches && !prefersReducedMotion;
+  if (!enableFluid) return;
+
+  // Defer until idle and off the initial chunk, same as the hero, so this
+  // section's own text/cards paint first.
+  await new Promise<void>((resolve) => {
+    const ric = (window as unknown as { requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => void }).requestIdleCallback;
+    if (ric) ric(() => resolve(), { timeout: 2000 });
+    else setTimeout(resolve, 200);
+  });
+
+  const WebGLFluid = (await import('webgl-fluid')).default;
 
   const fluidConfig = {
     IMMEDIATE: true,
