@@ -97,9 +97,13 @@
     background: var(--card-accent);
     transition: transform 0.15s ease, filter 0.15s ease;
 
-    &:hover {
-      transform: translateY(-2px);
-      filter: brightness(1.1);
+    // Guarded to real hover-capable pointers -- on touch, a tap has no matching
+    // "leave" event, so this would stay lifted/brightened until tapped elsewhere.
+    @media (hover: hover) and (pointer: fine) {
+      &:hover {
+        transform: translateY(-2px);
+        filter: brightness(1.1);
+      }
     }
   }
 }
@@ -139,10 +143,14 @@
     transition: opacity 0.2s ease;
   }
 
-  &:hover {
-    :deep(.swiper-button-prev),
-    :deep(.swiper-button-next) {
-      opacity: 1;
+  // Guarded to real hover-capable pointers -- on touch there's no hover to reveal
+  // these with, so they'd otherwise need a tap to even discover, not reveal cleanly.
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      :deep(.swiper-button-prev),
+      :deep(.swiper-button-next) {
+        opacity: 1;
+      }
     }
   }
 

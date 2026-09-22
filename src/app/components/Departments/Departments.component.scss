@@ -48,18 +48,22 @@
   border: solid 1px rgba(105, 105, 105, 0.35);
   transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 
-  &:hover {
-    border-color: var(--card-accent);
-    box-shadow: 0 12px 32px -12px var(--card-accent);
-  }
+  // Guarded to real hover-capable pointers -- on touch, a tap has no matching
+  // "leave" event, so these would stay lifted/highlighted until tapped elsewhere.
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      border-color: var(--card-accent);
+      box-shadow: 0 12px 32px -12px var(--card-accent);
+    }
 
-  // Alternate the hover motion so the cards don't all behave the same.
-  &:nth-of-type(odd):hover {
-    transform: translateY(-4px);
-  }
+    // Alternate the hover motion so the cards don't all behave the same.
+    &:nth-of-type(odd):hover {
+      transform: translateY(-4px);
+    }
 
-  &:nth-of-type(even):hover {
-    transform: translateX(6px);
+    &:nth-of-type(even):hover {
+      transform: translateX(6px);
+    }
   }
 
   .department-icon {

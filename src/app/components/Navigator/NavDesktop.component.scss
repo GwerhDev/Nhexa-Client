@@ -46,8 +46,12 @@ input {
   transition-duration: .4s;
 }
 
-.search-button:hover {
-  background-color: var(--primary-hover-color);
+// Guarded to real hover-capable pointers -- on touch, a tap has no matching
+// "leave" event, so this would stay stuck until the user tapped elsewhere.
+@media (hover: hover) and (pointer: fine) {
+  .search-button:hover {
+    background-color: var(--primary-hover-color);
+  }
 }
 
 .menu-desktop-container {
@@ -92,9 +96,13 @@ input {
     justify-content: center;
     transition-duration: .4s;
 
-    &:hover {
-      background-color: var(--menu-hover-color);
-      border: solid 1px var(--primary-color);
+    // Guarded to real hover-capable pointers -- on touch, a tap has no matching
+    // "leave" event, so this would stay stuck until the user tapped elsewhere.
+    @media (hover: hover) and (pointer: fine) {
+      &:hover {
+        background-color: var(--menu-hover-color);
+        border: solid 1px var(--primary-color);
+      }
     }
   }
 }

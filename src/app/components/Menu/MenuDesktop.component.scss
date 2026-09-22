@@ -103,8 +103,12 @@
   justify-content: start;
   color: var(--nhexa-white);
 
-  &:hover {
-    background-color: var(--menu-hover-color);
+  // Guarded to real hover-capable pointers -- on touch, a tap has no matching
+  // "leave" event, so this would stay stuck until the user tapped elsewhere.
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      background-color: var(--menu-hover-color);
+    }
   }
 }
 

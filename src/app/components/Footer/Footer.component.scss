@@ -71,9 +71,13 @@
     opacity: 0.85;
     transition: color 0.15s ease;
 
-    &:hover {
-      color: var(--primary-hover-color);
-      opacity: 1;
+    // Guarded to real hover-capable pointers -- on touch, a tap has no matching
+    // "leave" event, so this would stay stuck until the user tapped elsewhere.
+    @media (hover: hover) and (pointer: fine) {
+      &:hover {
+        color: var(--primary-hover-color);
+        opacity: 1;
+      }
     }
   }
 }

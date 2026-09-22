@@ -30,8 +30,13 @@ input {
   transition-duration: .4s;
 }
 
-.search-button:hover {
-  background-color: var(--primary-hover-color);
+// Guarded to real hover-capable pointers -- this "mobile" layout can still show on a
+// narrow desktop window with a real mouse; on touch, a tap has no matching "leave"
+// event, so this would stay stuck until the user tapped elsewhere.
+@media (hover: hover) and (pointer: fine) {
+  .search-button:hover {
+    background-color: var(--primary-hover-color);
+  }
 }
 
 .burger-menu-container {

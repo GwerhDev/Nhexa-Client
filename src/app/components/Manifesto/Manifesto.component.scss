@@ -64,9 +64,13 @@
   text-align: center;
   transition: border-color 0.15s ease, transform 0.15s ease;
 
-  &:hover {
-    border-color: var(--primary-hover-color);
-    transform: translateY(-4px);
+  // Guarded to real hover-capable pointers -- on touch, a tap has no matching
+  // "leave" event, so this would stay lifted/highlighted until tapped elsewhere.
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      border-color: var(--primary-hover-color);
+      transform: translateY(-4px);
+    }
   }
 
   .pillar-icon {

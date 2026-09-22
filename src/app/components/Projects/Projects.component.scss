@@ -85,10 +85,14 @@
     background-size: 22px 22px;
   }
 
-  &:hover {
-    transform: translateY(-4px);
-    border-color: color-mix(in oklch, var(--card-accent) 55%, transparent);
-    box-shadow: 0 20px 50px -20px color-mix(in oklch, var(--card-accent) 70%, transparent);
+  // Guarded to real hover-capable pointers -- on touch, a tap has no matching
+  // "leave" event, so this would stay lifted/highlighted until tapped elsewhere.
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      transform: translateY(-4px);
+      border-color: color-mix(in oklch, var(--card-accent) 55%, transparent);
+      box-shadow: 0 20px 50px -20px color-mix(in oklch, var(--card-accent) 70%, transparent);
+    }
   }
 
   @media (max-width: 860px) {

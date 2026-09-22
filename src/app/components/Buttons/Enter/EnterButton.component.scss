@@ -11,12 +11,17 @@
   transition-duration: .4s;  
 }
 
-.router-link:hover {
-  border-color: var(--primary-color);
-  background: linear-gradient(168deg, rgb(17, 17, 17) 20%, var(--primary-hover-color) 120%);
-  animation-name: resplandor;
-  animation-duration: .5s;
-  animation-timing-function: ease-in-out;
+// Guarded to real hover-capable pointers (mouse/trackpad) -- on touch, a tap has no
+// matching "leave" event, so this glow animation would fire on tap and stay stuck
+// until the user tapped elsewhere.
+@media (hover: hover) and (pointer: fine) {
+  .router-link:hover {
+    border-color: var(--primary-color);
+    background: linear-gradient(168deg, rgb(17, 17, 17) 20%, var(--primary-hover-color) 120%);
+    animation-name: resplandor;
+    animation-duration: .5s;
+    animation-timing-function: ease-in-out;
+  }
 }
 .router-link:focus,
 .router-link:focus-visible {

@@ -11,9 +11,13 @@
   color: var(--nhexa-white);
 }
 
-.router-link:hover {
-  border-color: var(--primary-color);
-  background: linear-gradient(168deg, rgb(17, 17, 17) 20%, var(--primary-hover-color) 120%);
+// Guarded to real hover-capable pointers -- on touch, a tap has no matching
+// "leave" event, so this would stay stuck until the user tapped elsewhere.
+@media (hover: hover) and (pointer: fine) {
+  .router-link:hover {
+    border-color: var(--primary-color);
+    background: linear-gradient(168deg, rgb(17, 17, 17) 20%, var(--primary-hover-color) 120%);
+  }
 }
 .router-link:focus,
 .router-link:focus-visible {

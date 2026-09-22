@@ -18,10 +18,14 @@
     transition: opacity 0.2s ease;
   }
 
-  &:hover {
-    :deep(.swiper-button-prev),
-    :deep(.swiper-button-next) {
-      opacity: 1;
+  // Guarded to real hover-capable pointers -- on touch there's no hover to reveal
+  // these with, so they'd otherwise need a tap to even discover, not reveal cleanly.
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      :deep(.swiper-button-prev),
+      :deep(.swiper-button-next) {
+        opacity: 1;
+      }
     }
   }
 
@@ -186,10 +190,14 @@
   background: var(--button-primary-color);
   transition: transform 0.15s ease, background 0.15s ease;
 
-  &:hover {
-    transform: translateY(-2px);
-    background: var(--button-primary-hover-color);
-    color: var(--nhexa-white);
+  // Guarded to real hover-capable pointers -- on touch, a tap has no matching
+  // "leave" event, so this would stay lifted/highlighted until tapped elsewhere.
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      transform: translateY(-2px);
+      background: var(--button-primary-hover-color);
+      color: var(--nhexa-white);
+    }
   }
 }
 

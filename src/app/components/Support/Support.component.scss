@@ -60,10 +60,14 @@
   background: var(--button-primary-color);
   transition: transform 0.15s ease, background 0.15s ease;
 
-  &:hover {
-    transform: translateY(-2px);
-    background: var(--button-primary-hover-color);
-    color: var(--nhexa-white);
+  // Guarded to real hover-capable pointers -- on touch, a tap has no matching
+  // "leave" event, so this would stay lifted/highlighted until tapped elsewhere.
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      transform: translateY(-2px);
+      background: var(--button-primary-hover-color);
+      color: var(--nhexa-white);
+    }
   }
 }
 

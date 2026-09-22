@@ -24,9 +24,14 @@
     border: solid 1px rgba(105, 105, 105, 0.705);
     background-color: var(--secondary-background-color);
 
-    &:hover {
-      border: 2px solid var(--primary-hover-color);
-      cursor: pointer;
+    cursor: pointer;
+
+    // Guarded to real hover-capable pointers -- on touch, a tap has no matching
+    // "leave" event, so this would stay stuck until the user tapped elsewhere.
+    @media (hover: hover) and (pointer: fine) {
+      &:hover {
+        border: 2px solid var(--primary-hover-color);
+      }
     }
 
     img {
