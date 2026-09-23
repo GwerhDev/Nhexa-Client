@@ -116,6 +116,12 @@ input {
   display: flex;
   align-items: center;
   padding-inline: .5rem;
+  transition: opacity .25s ease;
+
+  // Fades out as the row scrolls away, while its copies slide into the menu row.
+  &.is-hidden {
+    opacity: 0;
+  }
 
   img:hover {
     cursor: pointer;

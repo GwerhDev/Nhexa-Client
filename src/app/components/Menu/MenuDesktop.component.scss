@@ -24,47 +24,179 @@
   border-radius: .5rem;
 }
 
-.ul-search {
-  margin: 0;
-  padding: 0;
-  height: 56px;
+.nav-actions {
   display: flex;
-  backdrop-filter: blur(200px);
+  align-items: stretch;
+}
+
+// Same box as the menu bar: 56px tall, translucent panel, rounded.
+.action-button {
+  height: 56px;
+  min-width: 56px;
+  padding-inline: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  border: none;
   border-radius: .5rem;
+  color: var(--nhexa-white);
+  background: var(--components-background);
+  backdrop-filter: blur(200px);
+  cursor: pointer;
+  transition: background-color .25s ease;
 
-  li {
-    padding: 0;
-    margin: 0;
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    border-radius: .5rem;
-    background: var(--components-background);
-    backdrop-filter: blur(200px);
+  &:focus-visible {
+    outline: solid 1px var(--primary-color);
+  }
 
-    input {
-      width: 100%;
-      border: none;
-      padding-inline: 1rem;
-      background: transparent;
+  &.is-open {
+    background-color: var(--menu-hover-color);
+  }
 
-      &:focus,
-      &:focus-visible {
-        border: none;
-        outline: none;
-      }
+  // Guarded to real hover-capable pointers -- on touch, a tap has no matching
+  // "leave" event, so this would stay stuck until the user tapped elsewhere.
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      background-color: var(--menu-hover-color);
+    }
+  }
+}
+
+.search-anchor {
+  position: relative;
+}
+
+.search-popover {
+  position: absolute;
+  top: calc(100% + .5rem);
+  right: 0;
+  width: 320px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: .6rem;
+  border-radius: 8px;
+  background-color: var(--components-background-solid);
+  backdrop-filter: blur(100px);
+  box-shadow: 0 0 3px rgba(63, 54, 66, 0.555);
+  border: solid 1px rgba(105, 105, 105, 0.705);
+  z-index: 3;
+}
+
+.search-popover-label {
+  font-size: .8rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+  color: rgb(168, 168, 168);
+}
+
+.search-popover-field {
+  height: 44px;
+  display: flex;
+  align-items: center;
+  border-radius: .5rem;
+  border: solid 1px rgba(105, 105, 105, 0.705);
+  background: var(--components-background);
+  transition: border-color .25s ease;
+
+  &:focus-within {
+    border-color: var(--primary-color);
+  }
+
+  input {
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    border: none;
+    padding-inline: .8rem;
+    background: transparent;
+    color: var(--nhexa-white);
+
+    &::placeholder {
+      color: rgba(255, 255, 255, 0.4);
     }
 
-    button {
+    &:focus,
+    &:focus-visible {
       border: none;
-      background-color: transparent;
-
-      &:focus,
-      &:focus-visible {
-        border: none;
-        outline: none;
-      }
+      outline: none;
     }
+  }
+
+  button {
+    height: 100%;
+    padding-inline: .9rem;
+    border: none;
+    background: transparent;
+    color: var(--nhexa-white);
+    cursor: pointer;
+
+    &:focus,
+    &:focus-visible {
+      outline: none;
+    }
+  }
+}
+
+.popover-enter-active,
+.popover-leave-active {
+  transition: opacity .18s ease, transform .18s ease;
+}
+
+.popover-enter-from,
+.popover-leave-to {
+  opacity: 0;
+  transform: translateY(-6px);
+}
+
+// Collapsed to nothing until the nav turns compact, then slides down into place while
+// the menu bar (width: 100%) shrinks to make room for it.
+.inline-user-buttons {
+  display: flex;
+  max-width: 0;
+  margin-left: 0;
+  opacity: 0;
+  transform: translateY(-14px);
+  overflow: hidden;
+  transition:
+    max-width .35s cubic-bezier(.22, 1, .36, 1),
+    margin-left .35s cubic-bezier(.22, 1, .36, 1),
+    opacity .25s ease,
+    transform .35s cubic-bezier(.22, 1, .36, 1);
+
+  &.is-visible {
+    max-width: 200px;
+    margin-left: .5rem;
+    opacity: 1;
+    transform: none;
+  }
+
+  // Lifted only after the open animation ends, so the account dropdown isn't clipped.
+  &.is-settled {
+    overflow: visible;
+  }
+}
+
+// A container for the two menu buttons, not a button itself -- no hover highlight.
+.inline-user-inner {
+  cursor: default;
+  white-space: nowrap;
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      background-color: var(--components-background);
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .inline-user-buttons,
+  .popover-enter-active,
+  .popover-leave-active {
+    // Near-zero rather than none, so transitionend still fires and the inline group
+    // still lifts its clipping once it opens.
+    transition-duration: .01ms;
   }
 }
 
