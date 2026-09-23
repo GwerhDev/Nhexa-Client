@@ -2,7 +2,7 @@
 <script setup lang="ts">
 import { computed, ref, Ref } from 'vue';
 import { useStore } from '../../../middlewares/store';
-import { scrollToTop } from '../../../helpers/menu';
+import { scrollToTop, getMenuHref, getMenuTarget } from '../../../helpers/menu';
 import { useRouter } from 'vue-router';
 import SkeletonLoader from '../Loaders/SkeletonLoader.component.vue';
 
@@ -32,19 +32,19 @@ function search() {
         </router-link>
         <li v-for="(item, index) in menuList" :key="index">
           <div class="label-menu-link" :class="{ 'is-active': isActive(item.route || item.section) }">
-            <router-link v-if="item.route || item.section" :to="item.route || item.section">
-              <p class="pl-2 pr-2 d-flex align-cent gap-1 color-white font-bold">
-                {{ item.label }}
-                <font-awesome-icon v-if="item?.submenu" :icon="['fas', 'chevron-down']" />
-              </p>
-            </router-link>
-
-            <a v-else-if="item.href" :href="item.href">
+            <a v-if="getMenuHref(item)" :href="getMenuHref(item)">
               <p class="pl-2 pr-2 d-flex align-cent gap-1 color-white font-bold">
                 {{ item.label }}
                 <font-awesome-icon v-if="item?.submenu" :icon="['fas', 'chevron-down']" />
               </p>
             </a>
+
+            <router-link v-else-if="item.route || item.section" :to="getMenuTarget(item.route || item.section)">
+              <p class="pl-2 pr-2 d-flex align-cent gap-1 color-white font-bold">
+                {{ item.label }}
+                <font-awesome-icon v-if="item?.submenu" :icon="['fas', 'chevron-down']" />
+              </p>
+            </router-link>
 
             <span v-else>
               <p class="pl-2 pr-2 d-flex align-cent gap-1 font-bold">
@@ -55,7 +55,7 @@ function search() {
             <div class="submenu-container">
               <ul v-if="item?.submenu" class="submenu">
                 <li v-for="(subItem, subIndex) in item.submenu" :key="subIndex">
-                  <a v-if="subItem.href" class="label-submenu-link" :href="subItem.href">
+                  <a v-if="getMenuHref(subItem)" class="label-submenu-link" :href="getMenuHref(subItem)">
                     <span>
                       <img :src="subItem.icon" alt="" height="60">
                     </span>
@@ -70,7 +70,7 @@ function search() {
                       </li>
                     </ul>
                   </a>
-                  <router-link v-if="subItem.route" class="label-submenu-link" :to="subItem.route">
+                  <router-link v-else-if="subItem.route" class="label-submenu-link" :to="getMenuTarget(subItem.route)">
                     <span>
                       <img :src="subItem.icon" alt="" height="30">
                     </span>
