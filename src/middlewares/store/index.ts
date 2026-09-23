@@ -11,6 +11,9 @@ interface storeState {
   menuList: Array<any>,
   isLoading: boolean,
   activeSection: string,
+  // Shared by every AccMenu instance (the top-row one and its copy in the compact nav), so
+  // the account popover stays open/closed consistently when the nav switches between them.
+  accMenuOpen: boolean,
 }
 
 export const useStore = defineStore('store', {
@@ -20,11 +23,16 @@ export const useStore = defineStore('store', {
     menuList: [],
     isLoading: false,
     activeSection: '',
+    accMenuOpen: false,
   }),
 
   actions: {
     setActiveSection(id: string) {
       this.activeSection = id;
+    },
+
+    setAccMenuOpen(open: boolean) {
+      this.accMenuOpen = open;
     },
 
     logout() {

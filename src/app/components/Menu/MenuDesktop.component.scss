@@ -180,8 +180,20 @@
 
 // A container for the two menu buttons, not a button itself -- no hover highlight.
 .inline-user-inner {
+  position: relative;
   cursor: default;
   white-space: nowrap;
+
+  // Anchor the account popover to this pill instead of to the small avatar, so it opens
+  // at the same distance below the row as the search popover, right-aligned the same way.
+  :deep(.acc-menu-button) {
+    position: static;
+  }
+
+  :deep(.acc-menu-container) {
+    top: calc(100% + .5rem);
+    right: 0;
+  }
 
   @media (hover: hover) and (pointer: fine) {
     &:hover {

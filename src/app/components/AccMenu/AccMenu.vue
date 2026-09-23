@@ -23,16 +23,18 @@ const pathAccount: Ref<string> = ref('');
 const loginRoute: Ref<string> = ref('');
 const signupRoute: Ref<string> = ref('');
 
-const showDropdown = ref(false);
-const accMenuButton = ref<HTMLSpanElement | null>(null);
+const showDropdown = computed(() => store.accMenuOpen);
 
 const toggleDropdown = () => {
-  showDropdown.value = true;
+  store.setAccMenuOpen(true);
 };
 
+// There can be more than one AccMenu mounted at once (top row + compact nav) sharing the
+// same open state, so a click only counts as "outside" if it's outside all of them --
+// otherwise one instance would close the popover the other just opened.
 const handleClickOutside = (event: MouseEvent) => {
-  if (accMenuButton.value && !accMenuButton.value.contains(event.target as Node)) {
-    showDropdown.value = false;
+  if (!(event.target as Element | null)?.closest?.('.acc-menu-button')) {
+    store.setAccMenuOpen(false);
   }
 };
 
@@ -50,7 +52,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <span class="acc-menu-button" ref="accMenuButton">
+  <span class="acc-menu-button">
     <div class="profile-pic-container">
       <font-awesome-icon class="icon" v-if="isLoading" icon="fa-solid fa-spinner" spin />
       <template v-else>
