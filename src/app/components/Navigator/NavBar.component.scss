@@ -1,3 +1,11 @@
+// body has scroll-padding-top: 6rem so section anchors land below the nav. The pinned
+// nav sits inside that padding zone, so without this the browser treats anything focused
+// in it (clicking the search button, tabbing through links) as obscured and scrolls the
+// page up to "reveal" it. A matching negative scroll margin cancels that for the nav only.
+.nav-container :deep(*) {
+  scroll-margin-top: -6rem;
+}
+
 .nav-container {
   top: -4.7rem;
   margin: 0;
