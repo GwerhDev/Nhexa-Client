@@ -47,17 +47,16 @@ const pillars = [
         <span class="eyebrow">Acerca de</span>
         <h2>Conecta tus <b class="featured">sentidos</b></h2>
         <p>
-          <b>Nhexa Interface</b> es un espacio interdisciplinar, en donde áreas como la
+          <b>Nhexa Interface</b> es un espacio interdisciplinar en donde áreas como la
           programación y lo audiovisual colaboran para el desarrollo de proyectos de
           «nuevos medios», explorando tecnologías que hagan posible la interactividad e
           inmersión.
         </p>
         <p>
-          Desde el trabajo colectivo y cooperativo, se busca producir contenidos que generen
-          valor por sí mismos como obra, pero también como instancia de crecimiento para el
-          equipo y su autonomía. Este valor de los proyectos de Nhexa también se extiende a
-          las comunidades a las que se dirigen, a través de diálogo y participación constante,
-          para así generar medios que tengan sentido compartido y se sostengan en el tiempo.
+          Nhexa busca generar contenidos que sean valiosos como obra, tanto en su resultado
+          y recepción, como en sus procesos de producción, como instancias de
+          fortalecimiento del trabajo colectivo, de crecimiento para el equipo y para las
+          comunidades que participen de los proyectos.
         </p>
       </header>
 
