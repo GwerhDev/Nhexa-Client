@@ -25,6 +25,7 @@
 }
 
 .nav-actions {
+  position: relative;
   display: flex;
   align-items: stretch;
 }
@@ -150,39 +151,48 @@
   transform: translateY(-6px);
 }
 
-// Collapsed to nothing until the nav turns compact, then slides down into place while
-// the menu bar (width: 100%) shrinks to make room for it.
-.inline-user-buttons {
-  display: flex;
-  max-width: 0;
-  margin-left: 0;
-  opacity: 0;
-  transform: translateY(-14px);
-  overflow: hidden;
-  transition:
-    max-width .35s cubic-bezier(.22, 1, .36, 1),
-    margin-left .35s cubic-bezier(.22, 1, .36, 1),
-    opacity .25s ease,
-    transform .35s cubic-bezier(.22, 1, .36, 1);
-
-  &.is-visible {
-    max-width: 200px;
-    margin-left: .5rem;
-    opacity: 1;
-    transform: none;
-  }
-
-  // Lifted only after the open animation ends, so the account dropdown isn't clipped.
-  &.is-settled {
-    overflow: visible;
-  }
+// Grows from nothing to the pill's width (+ gap) as the nav pins, so the menu bar narrows
+// to make room exactly as the pill settles next to the search button.
+.inline-spacer {
+  flex-shrink: 0;
+  width: calc(var(--nav-progress, 0) * (var(--pill-w, 0px) + .5rem));
 }
 
-// A container for the two menu buttons, not a button itself -- no hover highlight.
+// The apps/account buttons. Resting place: the right end of this row. At the top of the
+// page it's shifted onto the top row's empty slot, and it glides back as the nav pins --
+// which, on screen, reads as the buttons staying put while the nav moves around them.
+// Only its background fades in; the icons are always visible.
 .inline-user-inner {
-  position: relative;
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 0;
   cursor: default;
   white-space: nowrap;
+  background: transparent;
+  backdrop-filter: none;
+  transform: translate(
+    calc((1 - var(--nav-progress, 0)) * var(--pill-dx, 0px)),
+    calc((1 - var(--nav-progress, 0)) * var(--pill-dy, 0px))
+  );
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background: var(--components-background);
+    backdrop-filter: blur(200px);
+    opacity: var(--nav-progress, 0);
+  }
+
+  // A container for the two menu buttons, not a button itself -- no hover highlight.
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      background: transparent;
+    }
+  }
 
   // Anchor the account popover to this pill instead of to the small avatar, so it opens
   // at the same distance below the row as the search popover, right-aligned the same way.
@@ -194,20 +204,11 @@
     top: calc(100% + .5rem);
     right: 0;
   }
-
-  @media (hover: hover) and (pointer: fine) {
-    &:hover {
-      background-color: var(--components-background);
-    }
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .inline-user-buttons,
   .popover-enter-active,
   .popover-leave-active {
-    // Near-zero rather than none, so transitionend still fires and the inline group
-    // still lifts its clipping once it opens.
     transition-duration: .01ms;
   }
 }

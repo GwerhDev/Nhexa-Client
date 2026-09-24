@@ -1,16 +1,12 @@
 <style scoped lang="scss" src="./MenuDesktop.component.scss" />
 <script setup lang="ts">
-import { computed, nextTick, onMounted, onUnmounted, ref, Ref, watch } from 'vue';
+import { computed, nextTick, onMounted, onUnmounted, ref, Ref } from 'vue';
 import { useStore } from '../../../middlewares/store';
 import { scrollToTop } from '../../../helpers/menu';
 import { useRouter } from 'vue-router';
 import SkeletonLoader from '../Loaders/SkeletonLoader.component.vue';
 import AppMenu from '../AppMenu/AppMenu.vue';
 import AccMenu from '../AccMenu/AccMenu.vue';
-
-// True once the nav's top row has scrolled away (see NavDesktop): the apps/account
-// buttons then slide into this row, next to the search button.
-const props = defineProps<{ compact?: boolean }>();
 
 const store = useStore();
 const router = useRouter();
@@ -47,15 +43,6 @@ function search() {
 const handleClickOutside = (event: MouseEvent) => {
   if (searchAnchor.value && !searchAnchor.value.contains(event.target as Node)) closeSearch();
 };
-
-// The inline group has to clip its content while it animates its width open, but that
-// same clipping would cut off the account dropdown -- so clipping is only lifted once the
-// open animation has finished.
-const inlineSettled = ref(false);
-watch(() => props.compact, (isCompact) => { if (!isCompact) inlineSettled.value = false; });
-function onInlineTransitionEnd(event: TransitionEvent) {
-  if (event.propertyName === 'max-width' && props.compact) inlineSettled.value = true;
-}
 
 onMounted(() => document.addEventListener('click', handleClickOutside));
 onUnmounted(() => document.removeEventListener('click', handleClickOutside));
@@ -166,16 +153,11 @@ onUnmounted(() => document.removeEventListener('click', handleClickOutside));
           </Transition>
         </div>
 
-        <div
-          class="inline-user-buttons"
-          :class="{ 'is-visible': compact, 'is-settled': inlineSettled }"
-          :inert="!compact || undefined"
-          @transitionend="onInlineTransitionEnd"
-        >
-          <div class="action-button inline-user-inner">
-            <AppMenu />
-            <AccMenu />
-          </div>
+        <!-- Room the menu bar gives up as the nav pins (see NavDesktop's --nav-progress). -->
+        <div class="inline-spacer" aria-hidden="true"></div>
+        <div class="action-button inline-user-inner">
+          <AppMenu />
+          <AccMenu />
         </div>
       </div>
     </div>
