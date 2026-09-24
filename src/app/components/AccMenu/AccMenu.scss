@@ -74,3 +74,21 @@
   border-color: var(--primary-color);
   cursor: pointer;
 }
+// Same open/close motion as the nav's search popover.
+.popover-enter-active,
+.popover-leave-active {
+  transition: opacity .18s ease, transform .18s ease;
+}
+
+.popover-enter-from,
+.popover-leave-to {
+  opacity: 0;
+  transform: translateY(-6px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .popover-enter-active,
+  .popover-leave-active {
+    transition-duration: .01ms;
+  }
+}

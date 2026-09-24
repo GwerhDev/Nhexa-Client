@@ -62,8 +62,9 @@ onUnmounted(() => {
           @click="toggleDropdown" alt="">
       </template>
     </div>
-    <div class="dropdown" v-if="showDropdown">
-      <ul class="acc-menu-container">
+    <div class="dropdown">
+      <Transition name="popover">
+      <ul v-if="showDropdown" class="acc-menu-container">
         <li class="current-user-data" v-if="!logged">
           <font-awesome-icon icon="fa-solid fa-user" size="2x" />
           <h4>Cuenta</h4>
@@ -97,6 +98,7 @@ onUnmounted(() => {
           </router-link>
         </li>
       </ul>
+      </Transition>
     </div>
   </span>
 </template>
