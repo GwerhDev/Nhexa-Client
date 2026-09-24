@@ -9,7 +9,7 @@
     width: 100%;
     display: flex;
     justify-content: center;
-    gap: 1rem;
+    gap: .5rem;
     max-width: 1740px;
   }
 }
@@ -152,7 +152,8 @@
 }
 
 // Grows from nothing to the pill's width (+ gap) as the nav pins, so the menu bar narrows
-// to make room exactly as the pill settles next to the search button.
+// to make room exactly as the pill settles next to the search button. The gap matches the
+// row's own gap (.inner-container) so the spacing between all three boxes is uniform.
 .inline-spacer {
   flex-shrink: 0;
   width: calc(var(--nav-progress, 0) * (var(--pill-w, 0px) + .5rem));
