@@ -233,7 +233,8 @@
     }
   }
 
-  &.router-link-exact-active,
+  // Only the scroll-spy drives this -- not vue-router's exact-active class, which ignores
+  // the hash and so kept the home link highlighted across the whole landing page.
   &.is-active {
     background-color: var(--menu-hover-color);
   }

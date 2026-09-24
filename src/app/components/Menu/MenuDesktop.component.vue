@@ -3,17 +3,23 @@
 import { computed, nextTick, onMounted, onUnmounted, ref, Ref } from 'vue';
 import { useStore } from '../../../middlewares/store';
 import { scrollToTop } from '../../../helpers/menu';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import SkeletonLoader from '../Loaders/SkeletonLoader.component.vue';
 import AppMenu from '../AppMenu/AppMenu.vue';
 import AccMenu from '../AccMenu/AccMenu.vue';
 
 const store = useStore();
 const router = useRouter();
+const route = useRoute();
 const menuList: Ref<any[]> = computed(() => store.menuList);
 
 const isActive = (section?: string): boolean =>
   !!section && !!store.activeSection && section.endsWith('#' + store.activeSection);
+
+// Home is active only on the landing page's first section (above any section with an id,
+// where the scroll-spy reports no active section) -- not on other routes like /search,
+// which also leave the active section empty.
+const isHomeActive = computed(() => route.path === '/' && !store.activeSection);
 
 const query = ref('');
 const searchOpen = ref(false);
@@ -52,7 +58,7 @@ onUnmounted(() => document.removeEventListener('click', handleClickOutside));
   <div class="container-menu-desk">
     <div class="inner-container">
       <ul class="ul-menu-desktop" v-if="menuList.length">
-        <router-link class="label-menu-link pl-2 pr-2" id="first" to="/" @click="scrollToTop()" :class="{ 'is-active': !store.activeSection }">
+        <router-link class="label-menu-link pl-2 pr-2" id="first" to="/" @click="scrollToTop()" :class="{ 'is-active': isHomeActive }">
           <font-awesome-icon :icon="['fas', 'house']" />
         </router-link>
         <li v-for="(item, index) in menuList" :key="index">
