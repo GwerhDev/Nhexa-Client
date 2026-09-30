@@ -57,7 +57,9 @@
 
 .app-swiper {
   width: 100%;
-  height: clamp(260px, 30vw, 420px);
+  // Same 16:9 as the app captures (1920x1080), at any width: the image fills the frame
+  // exactly, with nothing cropped and no bands around it.
+  aspect-ratio: 16 / 9;
   border-radius: 12px;
   overflow: hidden;
   border: solid 1px rgba(105, 105, 105, 0.4);

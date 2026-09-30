@@ -114,7 +114,8 @@
 
 .product-swiper {
   width: 100%;
-  aspect-ratio: 16 / 10;
+  // Same 16:9 as the app captures (1920x1080), so they fill the frame exactly.
+  aspect-ratio: 16 / 9;
   border-radius: 12px;
   overflow: hidden;
   border: solid 1px rgba(105, 105, 105, 0.4);
@@ -170,7 +171,8 @@
   img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    // Whole screenshot, never cropped (the frame already matches its 16:9).
+    object-fit: contain;
     display: block;
   }
 }
