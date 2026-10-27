@@ -13,7 +13,7 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 // whole solid/regular/brands packs — keeps the bundle small.
 import {
   faArrowRight, faBars, faChevronDown, faChevronRight, faCodeBranch,
-  faDownload, faFeatherPointed, faFilm, faTableCellsLarge, faHeadset, faHouse, faLayerGroup,
+  faDownload, faFeatherPointed, faFilm, faGear, faTableCellsLarge, faHeadset, faHouse, faLayerGroup,
   faMagnifyingGlass, faMicrochip, faPeopleArrows, faPeopleGroup, faPhotoFilm, faShieldHalved,
   faUniversalAccess, faWandMagicSparkles, faXmark,
   faHourglassHalf, faScrewdriverWrench, faSpinner, faUser,
@@ -22,7 +22,7 @@ import { faGithub, faInstagram, faLinkedin } from '@fortawesome/free-brands-svg-
 
 library.add(
   faArrowRight, faBars, faChevronDown, faChevronRight, faCodeBranch,
-  faDownload, faFeatherPointed, faFilm, faTableCellsLarge, faHeadset, faHouse, faLayerGroup,
+  faDownload, faFeatherPointed, faFilm, faGear, faTableCellsLarge, faHeadset, faHouse, faLayerGroup,
   faMagnifyingGlass, faMicrochip, faPeopleArrows, faPeopleGroup, faPhotoFilm, faShieldHalved,
   faUniversalAccess, faWandMagicSparkles, faXmark,
   faHourglassHalf, faScrewdriverWrench, faSpinner, faUser,
