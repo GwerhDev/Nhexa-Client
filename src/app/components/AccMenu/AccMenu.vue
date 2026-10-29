@@ -59,7 +59,7 @@ onUnmounted(() => {
       <template v-else>
         <font-awesome-icon class="icon" v-if="!logged" icon="fa-solid fa-user" @click="toggleDropdown" />
         <UserAvatar v-else class="profile-pic" :src="currentUser?.userData?.profilePic" :name="currentUser?.userData?.username"
-          size="1.3rem" border=".15rem" @click="toggleDropdown" />
+          size="1.6rem" border=".15rem" @click="toggleDropdown" />
       </template>
     </div>
     <div class="dropdown">
