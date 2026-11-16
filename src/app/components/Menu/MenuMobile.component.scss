@@ -1,5 +1,5 @@
 // As Accounts' mobile menu (NhexaAccounts-Client's MenuMobile): rows as wide as the menu, left
-// aligned, an icon and a label, no border nor radius; hovered, focused or open, a quiet glow
+// aligned, its icon and label, no border nor radius; hovered, focused or open, a quiet glow
 // surface's effects (style.css).
 .container-menu-mobile {
   width: 100%;
@@ -44,13 +44,6 @@
     letter-spacing: 0.12em;
     text-transform: uppercase;
     color: rgba(229, 229, 229, 0.55);
-  }
-
-  .menu-icon {
-    width: 1.75rem;
-    height: 1.75rem;
-    flex-shrink: 0;
-    object-fit: contain;
   }
 
   .menu-text {

@@ -43,6 +43,10 @@ import { computed, ref, Ref } from 'vue';
 import { closeMenu } from '../../../helpers/menu';
 import { useStore } from '../../../middlewares/store';
 import { useRouter } from 'vue-router';
+
+// The open page's look, only for a page of its own: a section of one (a route with a #) isn't
+// open, though vue-router counts it exact-active there (it doesn't compare the hash).
+const activeClassOf = (route?: string) => (route && !route.includes('#') ? 'router-link-exact-active' : '');
 import SkeletonLoader from '../Loaders/SkeletonLoader.component.vue';
 
 const store = useStore();
@@ -80,10 +84,8 @@ function search() {
         <div v-if="index > 0" class="separator mt-1 mb-1"></div>
         <ul class="ul-menu-mobile">
           <li v-if="item.route || item.section">
-            <!-- A section of the home page isn't a page open: vue-router counts it exact-active there
-                 (it doesn't compare the hash), so it never takes that look. -->
             <router-link class="menu-link glow-surface glow-surface--quiet" :to="item.route || item.section"
-              :exact-active-class="item.route ? 'router-link-exact-active' : ''" @click="closeMenu()">
+              :exact-active-class="activeClassOf(item.route)" @click="closeMenu()">
               {{ item.label }}
             </router-link>
           </li>
@@ -96,14 +98,19 @@ function search() {
 
           <li v-for="(subItem, subIndex) in item.submenu ?? []" :key="subIndex">
             <a v-if="subItem.href" class="menu-link glow-surface glow-surface--quiet" :href="subItem.href" @click="closeMenu()">
-              <img class="menu-icon" :src="subItem.icon" alt="">
+              <span>
+                <img :src="subItem.icon" alt="" height="60">
+              </span>
               <span class="menu-text">
                 {{ subItem.label }}
                 <small>{{ subItem.description }}</small>
               </span>
             </a>
-            <router-link v-else-if="subItem.route" class="menu-link glow-surface glow-surface--quiet" :to="subItem.route" @click="closeMenu()">
-              <img class="menu-icon" :src="subItem.icon" alt="">
+            <router-link v-else-if="subItem.route" class="menu-link glow-surface glow-surface--quiet" :to="subItem.route"
+              :exact-active-class="activeClassOf(subItem.route)" @click="closeMenu()">
+              <span>
+                <img :src="subItem.icon" alt="" height="60">
+              </span>
               <span class="menu-text">
                 {{ subItem.label }}
                 <small>{{ subItem.description }}</small>
