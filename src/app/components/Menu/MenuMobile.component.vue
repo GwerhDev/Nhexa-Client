@@ -102,7 +102,7 @@ function search() {
               <li v-for="(subItem, subIndex) in item.submenu" :key="subIndex">
                 <a v-if="subItem.href" @click="closeMenu()" class="mobile-submenu-link glow-surface glow-surface--quiet" :href="subItem.href">
                   <span>
-                    <img :src="subItem?.icon" alt="" height="60">
+                    <img :src="subItem?.icon" alt="" height="32">
                   </span>
                   <ul>
                     <li>
@@ -119,7 +119,7 @@ function search() {
                 <router-link  @click="closeMenu()" v-if="subItem.route" class="mobile-submenu-link glow-surface glow-surface--quiet" :to="subItem.route"
                   :exact-active-class="subItem.route.includes('#') ? '' : 'router-link-exact-active'">
                   <span>
-                    <img :src="subItem.icon" alt="" height="60">
+                    <img :src="subItem.icon" alt="" height="32">
                   </span>
                   <ul>
                     <li>
