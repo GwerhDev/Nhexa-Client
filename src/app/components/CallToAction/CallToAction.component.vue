@@ -15,7 +15,7 @@ useReveal(el);
         <h2>Lleva NHEXA contigo</h2>
         <p>Descarga NHEXA Hub y accede a todo el ecosistema desde un solo lugar.</p>
       </div>
-      <a :href="DOWNLOAD_URL + '/?product=nhexahub-desktop'" class="cta-button">
+      <a :href="DOWNLOAD_URL + '/?product=nhexahub-desktop'" class="cta-button hex-button hex-button--primary hex-button--lg">
         <font-awesome-icon :icon="['fas', 'download']" />
         Descargar NHEXA Hub
       </a>

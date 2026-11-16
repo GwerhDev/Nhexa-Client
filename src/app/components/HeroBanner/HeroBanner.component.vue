@@ -24,7 +24,7 @@
               <b>NHEXA Interface</b> es un espacio de <b>colaboración interdisciplinar</b> para el desarrollo autónomo de proyectos de
               <b>medios interactivos</b>, en retroalimentación abierta con las <b>comunidades</b> a las que estos estén dirigidos.
             </p>
-            <a class="hero-cta" href="/#manifesto">Saber más...</a>
+            <a class="hero-cta hex-button hex-button--primary" href="/#manifesto">Saber más...</a>
           </section>
           <!-- swiper-no-swiping: lets the drag rotate the 3D model instead of swiping the slide -->
           <section class="section-right swiper-no-swiping" ref="container">
@@ -48,7 +48,7 @@
               <h1 class="color-white bold">{{ slide.title }}</h1>
             </span>
             <p>{{ slide.text }}</p>
-            <a class="hero-cta" :href="slide.ctaHref" target="_blank" rel="noopener">{{ slide.ctaLabel }}</a>
+            <a class="hero-cta hex-button hex-button--primary" :href="slide.ctaHref" target="_blank" rel="noopener">{{ slide.ctaLabel }}</a>
           </section>
         </div>
       </swiper-slide>

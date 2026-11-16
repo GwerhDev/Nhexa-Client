@@ -81,7 +81,7 @@ onUnmounted(() => {
         <Logo />
       </div>
 
-      <a :href="DOWNLOAD_URL + '/?product=nhexahub-desktop'" class="download-button">
+      <a :href="DOWNLOAD_URL + '/?product=nhexahub-desktop'" class="download-button hex-button hex-button--sm">
         <font-awesome-icon :icon="['fas', 'download']" />
         Descargar NHEXA Hub
       </a>

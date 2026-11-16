@@ -83,28 +83,7 @@ input {
   padding-inline: 2rem;
   gap: 1rem;
 
-  .download-button {
-    gap: 1rem;
-    padding: .5rem;
-    padding-inline: 2rem;
-    border-radius: .5rem;
-    border: solid 1px #696969b4;
-    display: flex;
-    color: var(--nhexa-white);
-    text-wrap: nowrap;
-    align-items: center;
-    justify-content: center;
-    transition-duration: .4s;
 
-    // Guarded to real hover-capable pointers -- on touch, a tap has no matching
-    // "leave" event, so this would stay stuck until the user tapped elsewhere.
-    @media (hover: hover) and (pointer: fine) {
-      &:hover {
-        background-color: var(--menu-hover-color);
-        border: solid 1px var(--primary-color);
-      }
-    }
-  }
 }
 
 .icon {

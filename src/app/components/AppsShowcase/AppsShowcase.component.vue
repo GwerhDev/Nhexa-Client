@@ -58,7 +58,7 @@ useReveal(el);
           <h3>{{ app.name }}</h3>
           <p class="tagline">{{ app.tagline }}</p>
           <p class="description">{{ app.description }}</p>
-          <a class="app-link" :href="app.url" target="_blank" rel="noopener">
+          <a class="app-link hex-button" :href="app.url" target="_blank" rel="noopener">
             Explorar {{ app.name }}
             <font-awesome-icon :icon="['fas', 'arrow-right']" />
           </a>

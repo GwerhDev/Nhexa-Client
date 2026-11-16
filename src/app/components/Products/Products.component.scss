@@ -85,26 +85,9 @@
   }
 
   .product-link {
+    // A hex button (style.css), in its product's color.
+    --hex-color: var(--card-accent);
     margin-top: 0.5rem;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.7rem 1.3rem;
-    border-radius: 8px;
-    font-weight: 600;
-    text-decoration: none;
-    color: var(--nhexa-white);
-    background: var(--card-accent);
-    transition: transform 0.15s ease, filter 0.15s ease;
-
-    // Guarded to real hover-capable pointers -- on touch, a tap has no matching
-    // "leave" event, so this would stay lifted/brightened until tapped elsewhere.
-    @media (hover: hover) and (pointer: fine) {
-      &:hover {
-        transform: translateY(-2px);
-        filter: brightness(1.1);
-      }
-    }
   }
 }
 

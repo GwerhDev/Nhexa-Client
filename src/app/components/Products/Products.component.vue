@@ -36,7 +36,7 @@ useReveal(el);
           </span>
           <h3>{{ product.name }}</h3>
           <p>{{ product.description }}</p>
-          <a class="product-link" :href="product.url" target="_blank" rel="noopener">
+          <a class="product-link hex-button" :href="product.url" target="_blank" rel="noopener">
             Conocer {{ product.name }}
             <font-awesome-icon :icon="['fas', 'arrow-right']" />
           </a>
