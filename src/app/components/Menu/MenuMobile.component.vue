@@ -43,10 +43,6 @@ import { computed, ref, Ref } from 'vue';
 import { closeMenu } from '../../../helpers/menu';
 import { useStore } from '../../../middlewares/store';
 import { useRouter } from 'vue-router';
-
-// The open page's look, only for a page of its own: a section of one (a route with a #) isn't
-// open, though vue-router counts it exact-active there (it doesn't compare the hash).
-const activeClassOf = (route?: string) => (route && !route.includes('#') ? 'router-link-exact-active' : '');
 import SkeletonLoader from '../Loaders/SkeletonLoader.component.vue';
 
 const store = useStore();
@@ -78,48 +74,70 @@ function search() {
       </button>
     </div>
 
-    <!-- As Accounts' mobile menu: rows the menu's width, a separator between groups. -->
-    <div class="menu-groups" v-if="menuList.length">
-      <template v-for="(item, index) in menuList" :key="item.label">
-        <div v-if="index > 0" class="separator mt-1 mb-1"></div>
-        <ul class="ul-menu-mobile">
-          <li v-if="item.route || item.section">
-            <router-link class="menu-link glow-surface glow-surface--quiet" :to="item.route || item.section"
-              :exact-active-class="activeClassOf(item.route)" @click="closeMenu()">
+    <ul class="ul-menu-mobile" v-if="menuList.length">
+      <li v-for="item in menuList" :key="item.label">
+        <div class="mobile-menu-link">
+          <router-link v-if="item.route || item.section" :to="item.route || item.section" @click="closeMenu()">
+            <p class="pl-2 pr-2 d-flex align-cent gap-1 color-white font-bold">
               {{ item.label }}
-            </router-link>
-          </li>
-          <li v-else-if="item.href">
-            <a class="menu-link glow-surface glow-surface--quiet" :href="item.href" @click="closeMenu()">
-              {{ item.label }}
-            </a>
-          </li>
-          <li v-else class="menu-heading">{{ item.label }}</li>
+              <font-awesome-icon :icon="['fas', 'chevron-right']" />
+            </p>
+          </router-link>
 
-          <li v-for="(subItem, subIndex) in item.submenu ?? []" :key="subIndex">
-            <a v-if="subItem.href" class="menu-link glow-surface glow-surface--quiet" :href="subItem.href" @click="closeMenu()">
-              <span>
-                <img :src="subItem.icon" alt="" height="60">
-              </span>
-              <span class="menu-text">
-                {{ subItem.label }}
-                <small>{{ subItem.description }}</small>
-              </span>
-            </a>
-            <router-link v-else-if="subItem.route" class="menu-link glow-surface glow-surface--quiet" :to="subItem.route"
-              :exact-active-class="activeClassOf(subItem.route)" @click="closeMenu()">
-              <span>
-                <img :src="subItem.icon" alt="" height="60">
-              </span>
-              <span class="menu-text">
-                {{ subItem.label }}
-                <small>{{ subItem.description }}</small>
-              </span>
-            </router-link>
-          </li>
-        </ul>
-      </template>
-    </div>
+          <a v-else-if="item.href" :href="item.href" @click="closeMenu()">
+            <p class="pl-2 pr-2 d-flex align-cent gap-1 color-white font-bold">
+              {{ item.label }}
+              <font-awesome-icon :icon="['fas', 'chevron-right']" />
+            </p>
+          </a>
+
+          <span v-else>
+            <p class="pl-2 pr-2 d-flex align-cent gap-1 font-bold">
+              {{ item.label }}
+              <font-awesome-icon v-if="item?.submenu" :icon="['fas', 'chevron-down']" />
+            </p>
+          </span>
+          <div class="submenu-mobile-container">
+            <ul v-if="item?.submenu" class="submenu-mobile">
+              <li v-for="(subItem, subIndex) in item.submenu" :key="subIndex">
+                <a v-if="subItem.href" @click="closeMenu()" class="mobile-submenu-link glow-surface glow-surface--quiet" :href="subItem.href">
+                  <span>
+                    <img :src="subItem?.icon" alt="" height="60">
+                  </span>
+                  <ul>
+                    <li>
+                      {{ subItem.label }}
+                    </li>
+                    <li class="mobile-description">
+                      <small>
+                        {{ subItem.description }}
+                      </small>
+                    </li>
+                  </ul>
+                </a>
+
+                <router-link  @click="closeMenu()" v-if="subItem.route" class="mobile-submenu-link glow-surface glow-surface--quiet" :to="subItem.route"
+                  :exact-active-class="subItem.route.includes('#') ? '' : 'router-link-exact-active'">
+                  <span>
+                    <img :src="subItem.icon" alt="" height="60">
+                  </span>
+                  <ul>
+                    <li>
+                      {{ subItem.label }}
+                    </li>
+                    <li class="mobile-description">
+                      <small>
+                        {{ subItem.description }}
+                      </small>
+                    </li>
+                  </ul>
+                </router-link>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </li>
+    </ul>
     <div class="loader-container" v-else>
       <ul class="empty-submenu-mobile">
         <li>
