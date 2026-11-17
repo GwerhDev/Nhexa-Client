@@ -25,6 +25,7 @@ const setupScrollSpy = () => {
   const scroller = document.body;
 
   const update = () => {
+    if (store.pinnedSection !== null) return;
     const page = pageScroller();
     let current = '';
     for (const s of sections) {
@@ -38,8 +39,36 @@ const setupScrollSpy = () => {
     if (store.activeSection !== current) store.setActiveSection(current);
   };
 
+  // A click's scroll: the spy waits until it has ended (scrollend where there is one, else the
+  // page standing still for a few frames), then looks where it landed. The scroll can take a
+  // moment to start after the click: until it moves, up to a second (one with nowhere to go
+  // never starts).
+  let watching = 0;
+  const release = () => {
+    cancelAnimationFrame(watching);
+    if (store.pinnedSection === null) return;
+    store.releasePinnedSection();
+    update();
+  };
+  const watchScrollEnd = () => {
+    cancelAnimationFrame(watching);
+    const started = performance.now();
+    let last = pageScroller().scrollTop;
+    let moved = false;
+    let still = 0;
+    const frame = () => {
+      const top = pageScroller().scrollTop;
+      if (top !== last) { moved = true; still = 0; last = top; } else still++;
+      if ((moved && still >= 5) || (!moved && performance.now() - started > 1000)) release();
+      else watching = requestAnimationFrame(frame);
+    };
+    watching = requestAnimationFrame(frame);
+  };
+  const stopPinWatch = watch(() => store.pinnedSection, (pinned) => { if (pinned !== null) watchScrollEnd(); }, { immediate: true });
+
   let ticking = false;
   const onScroll = () => {
+    if (store.pinnedSection !== null) return;
     if (ticking) return;
     ticking = true;
     requestAnimationFrame(() => { update(); ticking = false; });
@@ -47,12 +76,18 @@ const setupScrollSpy = () => {
 
   scroller.addEventListener('scroll', onScroll, { passive: true });
   window.addEventListener('scroll', onScroll, { passive: true });
+  scroller.addEventListener('scrollend', release);
+  window.addEventListener('scrollend', release);
   window.addEventListener('resize', onScroll);
   update();
 
   cleanupSpy = () => {
+    stopPinWatch();
+    cancelAnimationFrame(watching);
     scroller.removeEventListener('scroll', onScroll);
     window.removeEventListener('scroll', onScroll);
+    scroller.removeEventListener('scrollend', release);
+    window.removeEventListener('scrollend', release);
     window.removeEventListener('resize', onScroll);
   };
 };
@@ -63,6 +98,7 @@ watch(() => route.path, (path) => {
   } else {
     cleanupSpy?.();
     cleanupSpy = null;
+    store.releasePinnedSection();
     store.setActiveSection('');
   }
 });

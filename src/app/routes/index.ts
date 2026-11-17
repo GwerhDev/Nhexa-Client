@@ -1,5 +1,6 @@
 import { RouteRecordRaw, createRouter, createWebHistory } from 'vue-router';
 import { pageScroller } from '../../utils/pageScroller';
+import { useStore } from '../../middlewares/store';
 import LandingPage from '../pages/LandingPage.vue';
 import SearchPage from '../pages/SearchPage.vue';
 
@@ -22,6 +23,8 @@ const router = createRouter({
   // What scrolls is <body> on a wide screen (html has overflow: hidden, so window.scrollTo
   // doesn't), the document on a phone: pageScroller says which.
   scrollBehavior(to) {
+    // The tab clicked is the active one for the whole scroll, not each section it passes.
+    if (to.path === '/') useStore().pinActiveSection(to.hash.slice(1));
     if (to.hash) {
       // scrollIntoView respects scroll-padding-top, so anchors land below the nav.
       const el = document.querySelector(to.hash);

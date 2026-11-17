@@ -13,6 +13,9 @@ interface storeState {
   menuList: MenuItem[],
   isLoading: boolean,
   activeSection: string,
+  // A section a click is scrolling to: active from the click on, the scroll spy waiting until
+  // the scroll ends (passing through the sections in between, it'd light each of them).
+  pinnedSection: string | null,
   // Shared by every AccMenu instance (the top-row one and its copy in the compact nav), so
   // the account popover stays open/closed consistently when the nav switches between them.
   accMenuOpen: boolean,
@@ -25,12 +28,22 @@ export const useStore = defineStore('store', {
     menuList: withMenuFallbacks([]),
     isLoading: false,
     activeSection: '',
+    pinnedSection: null,
     accMenuOpen: false,
   }),
 
   actions: {
     setActiveSection(id: string) {
       this.activeSection = id;
+    },
+
+    pinActiveSection(id: string) {
+      this.activeSection = id;
+      this.pinnedSection = id;
+    },
+
+    releasePinnedSection() {
+      this.pinnedSection = null;
     },
 
     setAccMenuOpen(open: boolean) {
