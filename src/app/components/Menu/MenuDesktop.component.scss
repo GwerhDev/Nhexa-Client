@@ -296,8 +296,17 @@
   // Guarded to real hover-capable pointers -- on touch, a tap has no matching
   // "leave" event, so this would stay stuck until the user tapped elsewhere.
   @media (hover: hover) and (pointer: fine) {
+    // As a hovered hex button: its color (as it shows on the page), the shine that sweeps it,
+    // its glow and its white label.
     &:hover {
-      background-color: var(--menu-hover-color);
+      position: relative;
+      z-index: 1;
+      color: #fff;
+      background:
+        linear-gradient(105deg, transparent 35%, rgba(255, 255, 255, 0.18) 50%, transparent 65%) 200% center / 300% 100% no-repeat,
+        color-mix(in srgb, var(--accent) 62%, #212929);
+      box-shadow: 0 0 var(--nhexa-desktop-glow-wide) var(--nhexa-desktop-glow-soft), 0 0 var(--nhexa-desktop-glow-tight) var(--nhexa-desktop-glow);
+      animation: hexButtonShine 0.5s ease-out forwards;
     }
   }
 }
