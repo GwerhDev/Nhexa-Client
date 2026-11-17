@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import { getNhexaEnv, getMenuList, getUserData } from '../services';
 import { clearUserToken } from '../services/token';
 import { MenuItem, withMenuFallbacks } from '../misc/menu';
+import { DEV_MENU } from '../misc/devMenu';
 
 export interface AppEntry { label: string; url: string; icon: string; color?: string; description?: string; route?: string }
 export interface EnvCategory { id: string; name: string; apps: AppEntry[] }
@@ -74,7 +75,9 @@ export const useStore = defineStore('store', {
     },
 
     async handleGetMenuList() {
-      this.menuList = withMenuFallbacks(await getMenuList());
+      const fetched = await getMenuList();
+      // Without a menu from the local export, the development one (a submenu included).
+      this.menuList = withMenuFallbacks(import.meta.env.DEV && !Array.isArray(fetched) ? DEV_MENU : fetched);
       return;
     }
   }
