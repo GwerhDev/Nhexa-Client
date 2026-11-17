@@ -6,6 +6,9 @@
 
 .mobile-menu-link {
   width: 100%;
+  // Its padding inside its width: else it's the menu's width and a padding wider, and the
+  // menu scrolls sideways.
+  box-sizing: border-box;
   padding-inline: .5rem;
   color: var(--nhexa-white);
   display: flex;

@@ -9,6 +9,8 @@
   background: var(--components-background);
   backdrop-filter: blur(200px);
   border-radius: .5rem;
+  /* Its padding inside its width, so it doesn't make the menu scroll sideways. */
+  box-sizing: border-box;
   padding-inline: .25rem;
 }
 
