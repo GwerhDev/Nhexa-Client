@@ -322,6 +322,11 @@
 :root {
   --nhexa-hex-cap-left: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 86.6'%3E%3Cpolygon points='6,43.3 16,5.2 300,5.2 300,81.41 16,81.41' fill='black' stroke='black' stroke-width='10.39' stroke-linejoin='round'/%3E%3C/svg%3E");
   --nhexa-hex-cap-right: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 86.6'%3E%3Cpolygon points='24,43.3 14,5.2 -270,5.2 -270,81.41 14,81.41' fill='black' stroke='black' stroke-width='10.39' stroke-linejoin='round'/%3E%3C/svg%3E");
+  /* A left end cut in by the tip of the shape before it (the right cap, a little apart): what
+     follows a tip fits around it. Wider than a cap (40 of 86.6), so the cut's point fits in it;
+     -inner is the same cut a border further in, for a face inside a border. */
+  --nhexa-hex-notch-left: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 86.6'%3E%3Cmask id='m'%3E%3Crect width='40' height='86.6' fill='white'/%3E%3Cpolygon points='28.6,43.3 18.6,5.2 -270,5.2 -270,81.41 18.6,81.41' fill='black' stroke='black' stroke-width='10.39' stroke-linejoin='round'/%3E%3C/mask%3E%3Crect width='40' height='86.6' mask='url(%23m)'/%3E%3C/svg%3E");
+  --nhexa-hex-notch-left-inner: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 86.6'%3E%3Cmask id='m'%3E%3Crect width='40' height='86.6' fill='white'/%3E%3Cpolygon points='30.9,43.3 20.9,5.2 -270,5.2 -270,81.41 20.9,81.41' fill='black' stroke='black' stroke-width='10.39' stroke-linejoin='round'/%3E%3C/mask%3E%3Crect width='40' height='86.6' mask='url(%23m)'/%3E%3C/svg%3E");
 }
 
 .hex-button {

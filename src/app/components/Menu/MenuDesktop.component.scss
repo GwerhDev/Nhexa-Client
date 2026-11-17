@@ -248,6 +248,33 @@
     &::after {
       left: calc(-1 * var(--tab-cap));
     }
+
+    // Its left end cut in around that tip (a little apart), so lit it fits against it.
+    --tab-notch: calc(var(--tab-cap) * 4 / 3);
+
+    &::before {
+      -webkit-mask:
+        var(--nhexa-hex-notch-left) left center / auto 100% no-repeat,
+        var(--nhexa-hex-cap-right) right center / auto 100% no-repeat,
+        linear-gradient(#000 0 0) calc(var(--tab-notch) - 2px) center / calc(100% - var(--tab-notch) - var(--tab-cap) + 4px) 100% no-repeat;
+      mask:
+        var(--nhexa-hex-notch-left) left center / auto 100% no-repeat,
+        var(--nhexa-hex-cap-right) right center / auto 100% no-repeat,
+        linear-gradient(#000 0 0) calc(var(--tab-notch) - 2px) center / calc(100% - var(--tab-notch) - var(--tab-cap) + 4px) 100% no-repeat;
+    }
+
+    // The face: the same cut a border further in, sized to the whole tab (the face is a border
+    // shorter at each edge).
+    &::after {
+      -webkit-mask:
+        var(--nhexa-hex-notch-left-inner) left center / var(--tab-notch) var(--tab-h) no-repeat,
+        var(--nhexa-hex-cap-right) right center / auto 100% no-repeat,
+        linear-gradient(#000 0 0) calc(var(--tab-notch) - 2px) center / calc(100% - var(--tab-notch) - (var(--tab-h) - 2 * var(--tab-border)) * 0.3464 + 4px) 100% no-repeat;
+      mask:
+        var(--nhexa-hex-notch-left-inner) left center / var(--tab-notch) var(--tab-h) no-repeat,
+        var(--nhexa-hex-cap-right) right center / auto 100% no-repeat,
+        linear-gradient(#000 0 0) calc(var(--tab-notch) - 2px) center / calc(100% - var(--tab-notch) - (var(--tab-h) - 2 * var(--tab-border)) * 0.3464 + 4px) 100% no-repeat;
+    }
   }
 }
 
