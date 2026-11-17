@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { getNhexaEnv, getMenuList, getUserData } from '../services';
 import { clearUserToken } from '../services/token';
+import { MenuItem, withMenuFallbacks } from '../misc/menu';
 
 export interface AppEntry { label: string; url: string; icon: string; color?: string; description?: string; route?: string }
 export interface EnvCategory { id: string; name: string; apps: AppEntry[] }
@@ -8,7 +9,8 @@ export interface EnvCategory { id: string; name: string; apps: AppEntry[] }
 interface storeState {
   currentUser: any,
   appList: EnvCategory[],
-  menuList: Array<any>,
+  // Home, the export's menu, Support (see misc/menu): the two of them from the start.
+  menuList: MenuItem[],
   isLoading: boolean,
   activeSection: string,
   // Shared by every AccMenu instance (the top-row one and its copy in the compact nav), so
@@ -20,7 +22,7 @@ export const useStore = defineStore('store', {
   state: (): storeState => ({
     currentUser: {},
     appList: [],
-    menuList: [],
+    menuList: withMenuFallbacks([]),
     isLoading: false,
     activeSection: '',
     accMenuOpen: false,
@@ -59,7 +61,7 @@ export const useStore = defineStore('store', {
     },
 
     async handleGetMenuList() {
-      this.menuList = await getMenuList();
+      this.menuList = withMenuFallbacks(await getMenuList());
       return;
     }
   }

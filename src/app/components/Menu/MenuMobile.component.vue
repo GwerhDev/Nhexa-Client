@@ -47,7 +47,8 @@ import SkeletonLoader from '../Loaders/SkeletonLoader.component.vue';
 
 const store = useStore();
 const router = useRouter();
-const menuList: Ref<any[]> = computed(() => store.menuList);
+// Home isn't one of its rows (only the wide bar's house icon).
+const menuList: Ref<any[]> = computed(() => store.menuList.filter(item => !item.home));
 
 const query = ref('');
 

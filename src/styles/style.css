@@ -528,8 +528,7 @@
    mobile menus' items: their own shape, no border): the same glass face, the tint of its
    color (--hex-color), the shine that sweeps it and the desktop's glow (here a box shadow, the
    shape being a box), on hover and keyboard focus; the page open now as --primary, a steady
-   tint and glow. --quiet shows nothing at rest, only hovered or open (a menu's tabs). The same
-   in Nhexa-Client and NhexaAccounts-Client (keep both identical). */
+   tint and glow. --quiet shows nothing at rest, only hovered or open (a menu's items). */
 .glow-surface {
   --hex-color: var(--accent);
   --hex-tint: 0%;
