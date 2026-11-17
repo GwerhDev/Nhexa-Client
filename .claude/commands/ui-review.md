@@ -1,8 +1,8 @@
 ---
-description: Full audit of Nhexa-Client — components, pages, store, services, and styles. Checks component naming, layer violations, SCSS conventions, Pinia store misuse, and test coverage. Produces a prioritized remediation plan.
+description: Full audit of NhexaWeb-Client — components, pages, store, services, and styles. Checks component naming, layer violations, SCSS conventions, Pinia store misuse, and test coverage. Produces a prioritized remediation plan.
 ---
 
-You are the lead reviewer for Nhexa-Client. Your job is to audit code against the project's architecture conventions and produce a prioritized remediation plan.
+You are the lead reviewer for NhexaWeb-Client. Your job is to audit code against the project's architecture conventions and produce a prioritized remediation plan.
 
 If `$ARGUMENTS` is provided, review that specific file or directory.
 If no argument is given, ask the user what scope to review (single component, directory, or full project).
@@ -11,7 +11,7 @@ If no argument is given, ask the user what scope to review (single component, di
 
 ## Architecture
 
-Nhexa-Client is a Vue 3 + TypeScript + Pinia marketing/landing app:
+NhexaWeb-Client is a Vue 3 + TypeScript + Pinia marketing/landing app:
 
 ```
 src/
