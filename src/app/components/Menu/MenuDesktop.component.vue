@@ -58,27 +58,29 @@ onUnmounted(() => document.removeEventListener('click', handleClickOutside));
   <div class="container-menu-desk">
     <div class="inner-container">
       <ul class="ul-menu-desktop" v-if="menuList.length">
-        <template v-for="item in menuList" :key="item.label">
-        <router-link v-if="item.home" class="label-menu-link pl-2 pr-2" id="first" to="/" @click="scrollToTop()" :class="{ 'is-active': isHomeActive }">
+        <template v-for="(item, index) in menuList" :key="item.label">
+        <router-link v-if="item.home" class="label-menu-link hex-tab pl-2 pr-2" id="first" to="/" @click="scrollToTop()" :class="{ 'is-active': isHomeActive }"
+          :style="{ zIndex: menuList.length - index }">
           <font-awesome-icon :icon="['fas', 'house']" />
         </router-link>
-        <li v-else>
+        <!-- Each one over the next: its tip lies over the next tab, which starts under it. -->
+        <li v-else class="menu-item" :style="{ zIndex: menuList.length - index }">
           <div class="label-menu-link" :class="{ 'is-active': isActive(item.route || item.section) }">
-            <router-link v-if="item.route || item.section" :to="item.route || item.section">
+            <router-link v-if="item.route || item.section" class="hex-tab" :to="item.route || item.section">
               <p class="pl-2 pr-2 d-flex align-cent gap-1 color-white font-bold">
                 {{ item.label }}
                 <font-awesome-icon v-if="item?.submenu" :icon="['fas', 'chevron-down']" />
               </p>
             </router-link>
 
-            <a v-else-if="item.href" :href="item.href">
+            <a v-else-if="item.href" class="hex-tab" :href="item.href">
               <p class="pl-2 pr-2 d-flex align-cent gap-1 color-white font-bold">
                 {{ item.label }}
                 <font-awesome-icon v-if="item?.submenu" :icon="['fas', 'chevron-down']" />
               </p>
             </a>
 
-            <span v-else>
+            <span v-else class="hex-tab">
               <p class="pl-2 pr-2 d-flex align-cent gap-1 font-bold">
                 {{ item.label }}
                 <font-awesome-icon v-if="item.submenu" :icon="['fas', 'chevron-down']" />

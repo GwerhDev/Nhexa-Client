@@ -214,8 +214,13 @@
   }
 }
 
+// Each item: its link a hex tab (style.css) as tall as the bar, its tip at its right, lit on
+// hover and when its section is the one in view (.is-active, only the scroll spy's: not
+// vue-router's exact-active class, which ignores the hash and kept Home lit across the whole
+// landing page). The tab is the link, not the item: the item holds its submenu, which the
+// tab's glow would wrap too.
 .label-menu-link {
-  transition-duration: .4s;
+  --tab-h: 3.5rem;
   color: var(--nhexa-white);
   display: flex;
   align-items: center;
@@ -224,20 +229,31 @@
   position: relative;
   cursor: pointer;
 
-  &:hover {
-    background-color: var(--menu-hover-color);
+  &:hover .submenu {
+    border-radius: .5rem;
+    display: flex;
+  }
 
-    .submenu {
-      border-radius: .5rem;
-      display: flex;
+  > .hex-tab {
+    --tab-h: 3.5rem;
+    display: flex;
+    align-items: center;
+    padding-right: var(--tab-cap);
+    color: var(--nhexa-white);
+
+    // It starts under the tab before it, as far as that one's tip reaches: lit next to it, the
+    // two read as one chain (the one before is over it, see .menu-item), not a straight edge
+    // against a tip.
+    &::before,
+    &::after {
+      left: calc(-1 * var(--tab-cap));
     }
   }
+}
 
-  // Only the scroll-spy drives this -- not vue-router's exact-active class, which ignores
-  // the hash and so kept the home link highlighted across the whole landing page.
-  &.is-active {
-    background-color: var(--menu-hover-color);
-  }
+// Each item over the next (its z-index, by its place: set in the template).
+.menu-item {
+  position: relative;
 }
 
 .label-submenu-link {
@@ -281,7 +297,13 @@
   color: rgb(168, 168, 168);
 }
 
+// Home: the first tab, its left corners the bar's.
 #first {
-  border-top-left-radius: .5rem;
-  border-bottom-left-radius: .5rem;
+  padding-right: calc(var(--tab-cap) + 1rem);
+
+  &::before,
+  &::after {
+    border-top-left-radius: .5rem;
+    border-bottom-left-radius: .5rem;
+  }
 }
