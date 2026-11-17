@@ -191,3 +191,23 @@ input:disabled {
 ::-webkit-scrollbar-thumb:hover {
   background: linear-gradient(168deg, #414141 20%, var(--button-primary-hover-color) 120%);
 }
+
+/* On a phone the document scrolls, as on any site: not <body> inside a fixed-height <html>,
+   which the browser takes for a box inside the page (its bars don't fold away, its overscroll
+   and pull-to-refresh don't work). Never sideways (clip: it doesn't make a scroller of its
+   own). The anchors still land below the fixed bar. */
+@media (max-width: 1080px) {
+  :root {
+    height: auto;
+    min-height: 100%;
+    overflow: visible;
+    overflow-x: clip;
+    scroll-behavior: smooth;
+    scroll-padding-top: 6rem;
+  }
+
+  body {
+    min-height: 100dvh;
+    overflow: visible;
+  }
+}

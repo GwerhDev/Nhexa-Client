@@ -1,4 +1,5 @@
 import { RouteRecordRaw, createRouter, createWebHistory } from 'vue-router';
+import { pageScroller } from '../../utils/pageScroller';
 import LandingPage from '../pages/LandingPage.vue';
 import SearchPage from '../pages/SearchPage.vue';
 
@@ -18,8 +19,8 @@ const routes: RouteRecordRaw[] = [
 const router = createRouter({
   history: createWebHistory(),
   routes,
-  // The scroll container is <body> (html has overflow:hidden), so window.scrollTo
-  // does not work; scroll the element/body directly.
+  // What scrolls is <body> on a wide screen (html has overflow: hidden, so window.scrollTo
+  // doesn't), the document on a phone: pageScroller says which.
   scrollBehavior(to) {
     if (to.hash) {
       // scrollIntoView respects scroll-padding-top, so anchors land below the nav.
@@ -30,7 +31,7 @@ const router = createRouter({
       return false;
     }
     // Any hash-less navigation (e.g. '/') always lands at the top.
-    document.body.scrollTo({ top: 0, behavior: 'smooth' });
+    pageScroller().scrollTo({ top: 0, behavior: 'smooth' });
     return false;
   }
 });

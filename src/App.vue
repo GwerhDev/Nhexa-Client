@@ -4,6 +4,7 @@ import FooterComponent from './app/components/Footer/Footer.component.vue';
 import { onMounted, onUnmounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { useStore } from './middlewares/store';
+import { pageScroller } from './utils/pageScroller';
 const store: any = useStore();
 const route = useRoute();
 
@@ -12,7 +13,8 @@ let cleanupSpy: (() => void) | null = null;
 // Scroll-spy by position: the active section is the LAST one whose top has
 // scrolled under the nav line. Above the first section (hero, no id) -> '' (home).
 // At the bottom of the page the last section is forced active (it may never
-// reach the line). The scroll container is <body> (html has overflow:hidden).
+// reach the line). What scrolls is <body> on a wide screen, the document on a phone
+// (pageScroller): both are listened to.
 const setupScrollSpy = () => {
   const sections = Array.from(
     document.querySelectorAll<HTMLElement>('.main-container > *[id]')
@@ -23,13 +25,14 @@ const setupScrollSpy = () => {
   const scroller = document.body;
 
   const update = () => {
+    const page = pageScroller();
     let current = '';
     for (const s of sections) {
       if (s.getBoundingClientRect().top <= OFFSET) current = s.id;
       else break;
     }
     // Bottom of page: force the last section active.
-    if (scroller.scrollTop + scroller.clientHeight >= scroller.scrollHeight - 2) {
+    if (page.scrollTop + page.clientHeight >= page.scrollHeight - 2) {
       current = sections[sections.length - 1].id;
     }
     if (store.activeSection !== current) store.setActiveSection(current);

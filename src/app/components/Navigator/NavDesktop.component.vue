@@ -55,7 +55,7 @@ let resizeObserver: ResizeObserver | null = null;
 onMounted(() => {
   measure();
   update();
-  // The scroll container is <body> (html has overflow:hidden); window kept as a fallback.
+  // What scrolls is <body> on a wide screen, the document on a phone: both listened to.
   document.body.addEventListener('scroll', onScroll, { passive: true });
   window.addEventListener('scroll', onScroll, { passive: true });
   window.addEventListener('resize', onResize);

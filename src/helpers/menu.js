@@ -1,4 +1,5 @@
 import { $d } from "../utils/cssSelector";
+import { pageScroller } from "../utils/pageScroller";
 
 export function openMenu() {
   $d(".nav-menu-ul").style.height="100vh";
@@ -14,7 +15,7 @@ export function closeMenu() {
   $d(".burger-menu-container").style.display="flex";
 }
 
-// The scroll container is <body> (html has overflow:hidden).
+// What scrolls the page (see pageScroller): <body> on a wide screen, the document on a phone.
 export function scrollToTop() {
-  document.body.scrollTo({ top: 0, behavior: "smooth" });
+  pageScroller().scrollTo({ top: 0, behavior: "smooth" });
 }
